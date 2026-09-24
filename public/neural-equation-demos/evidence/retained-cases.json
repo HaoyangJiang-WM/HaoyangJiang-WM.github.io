@@ -1,0 +1,50 @@
+[
+  {
+    "task": "diffusion2d",
+    "kind": "nie_mlp",
+    "selection": "Exploratory screen A, then locked independent B",
+    "B_ratio_to_best_NODE": {
+      "4": 0.15249559061352314,
+      "8": 0.044116743966819943
+    },
+    "B_three_seeds": [
+      5301,
+      5302,
+      5303
+    ],
+    "B_ID8T_failures": 0,
+    "recommended_scope": "保留为NIE相对历史NODE的长期传感器预测案例；同族输入NDDE更准确，频率变化后两者接近。不是全场二维预测。"
+  },
+  {
+    "task": "relaxation",
+    "kind": "nie_exp",
+    "selection": "Exploratory screen A, then locked independent B",
+    "B_ratio_to_best_NODE": {
+      "4": 0.4180002372169216,
+      "8": 0.25010845785869706
+    },
+    "B_three_seeds": [
+      5301,
+      5302,
+      5303
+    ],
+    "B_ID8T_failures": 0,
+    "recommended_scope": "保留为多尺度记忆案例；同族输入NDDE更准确，频率翻倍时NIE均值更低。指数核有明确衰减族先验。"
+  },
+  {
+    "task": "wave1d",
+    "kind": "nie_mlp",
+    "selection": "Exploratory screen A, then locked independent B",
+    "B_ratio_to_best_NODE": {
+      "4": 0.31626825568906547,
+      "8": 0.1358088525453408
+    },
+    "B_three_seeds": [
+      5301,
+      5302,
+      5303
+    ],
+    "B_ID8T_failures": 0,
+    "recommended_scope": "仅保留同族驱动的长时预测；未知频率外推误差很大。不能声称NIE稳定优于NDDE。"
+  }
+]

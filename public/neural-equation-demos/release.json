@@ -1,1 +1,95 @@
-{"release":"neural-equations-online-20260923","case_policy":"fixed test case 0, seeds 3011/3012/3013","summary_policy":"all 64 test inputs and three seeds per configuration","edition":"compact online replay; source archive retained separately","site":"/neural-equation-demos/"}
+{
+  "edition": "NIE-MultiCase-B-20260924",
+  "case_selection": "Fixed confirmation-set B case 0, not selected by error",
+  "seeds": [
+    5301,
+    5302,
+    5303
+  ],
+  "T": 3.2,
+  "tasks": {
+    "diffusion2d": {
+      "sha256": "53c1ec42bf732ac28b283dec22d71e5df339d3ad6f3af493f7ac8f73b0664e38",
+      "maximum_quantization_error": 8.667330434072362e-06,
+      "parts": [
+        "assets/diffusion2d.part0.txt",
+        "assets/diffusion2d.part1.txt",
+        "assets/diffusion2d.part2.txt",
+        "assets/diffusion2d.part3.txt",
+        "assets/diffusion2d.part4.txt"
+      ]
+    },
+    "relaxation": {
+      "sha256": "52ead007d476795eb53f8a6a06e33aeb2e90f30e00e84d974139c23264707c83",
+      "maximum_quantization_error": 1.6219523918489296e-05,
+      "parts": [
+        "assets/relaxation.part0.txt",
+        "assets/relaxation.part1.txt",
+        "assets/relaxation.part2.txt",
+        "assets/relaxation.part3.txt",
+        "assets/relaxation.part4.txt",
+        "assets/relaxation.part5.txt",
+        "assets/relaxation.part6.txt",
+        "assets/relaxation.part7.txt",
+        "assets/relaxation.part8.txt",
+        "assets/relaxation.part9.txt"
+      ]
+    },
+    "wave1d": {
+      "sha256": "fefe4e5db5554451d7558cfed5c72418a23cac87582eac8c4999b29256c936be",
+      "maximum_quantization_error": 3.8822041657101734e-05,
+      "parts": [
+        "assets/wave1d.part0.txt",
+        "assets/wave1d.part1.txt",
+        "assets/wave1d.part2.txt",
+        "assets/wave1d.part3.txt",
+        "assets/wave1d.part4.txt",
+        "assets/wave1d.part5.txt",
+        "assets/wave1d.part6.txt",
+        "assets/wave1d.part7.txt",
+        "assets/wave1d.part8.txt",
+        "assets/wave1d.part9.txt"
+      ]
+    }
+  },
+  "display": "Every second stored time point (129 samples); each curve quantized to 16 bits independently for display only. Summary metrics use all stored points, all 64 inputs and all 3 seeds.",
+  "assets": {
+    "index.html": "10ae81b4a2da6cfa270127a8450ba15226d0328eb2d6dfc3c91be03782e6fb26",
+    "README.md": "1e89ee21460e739133966d8ff3b55b54e54f9e6ca93347149d74a935e3135295",
+    "assets/site.css": "799c4034d63c6b42e95063fee7e8b601d25e54727208c86e6c41c0ebe55584b0",
+    "assets/memory.js": "e476f007342acf7dd838b871dc38b07578954a08910131f69acc6c12020d4254",
+    "assets/icon.svg": "3634c97ece8139e8b3eaab273b336232415d3b074da1cc52557d194aa15ba82f",
+    "evidence/protocol.md": "1f1945c110596b83d2c7cc4426c6dbde7b98bf818dc44b27d8963c4a16672c84",
+    "evidence/retained-cases.json": "aa68eeab2f8128b70e74ad8f483bfd14cb1dfece01e7031e5ef44642db217063",
+    "evidence/screen-summary.csv": "084a04c77b4751333baa70c81b504275cb96a0fee8b5674d9119fe3c41064721",
+    "evidence/confirmation-summary.csv": "dcce8def31c9d5451c74ed25d4d7c740398acf0cb6f1ba58eabb92641fa96df4",
+    "evidence/refinement-summary.csv": "f57c23362934aac18da10abe463d897bb055a21797fe75a69871ead0d03b64b6",
+    "tools/verify_publication.py": "f680339de4408449b38835f65ba5dd24949cfe71739d76f694684026670cd3cb",
+    "assets/diffusion2d.part0.txt": "37cb8e483cbe5b9fac4bb39fb425e472b2bcbf84fd5088eb3baf64f42f1df3ce",
+    "assets/diffusion2d.part1.txt": "98a0b8610b4a93a6c83a6c9e62613cb364f2e3d01c56ae3a36a401d39d19982c",
+    "assets/diffusion2d.part2.txt": "804dfa008bc3acf7c0600ae9f48942ede427fd2950321497b618d950a5988bac",
+    "assets/diffusion2d.part3.txt": "19ba9d3413fe201ab3faa075160c8a07a42c5ea37245e3d8931b11481180d441",
+    "assets/diffusion2d.part4.txt": "6f118ad361c0b573fc8d36fd1d4515a41ac470b7d95562fc6b2ac2b2f72098a0",
+    "assets/relaxation.part0.txt": "9c4abc05eb225a4a0180e8c53bef862cdfc237956bb3528c0051d1bbd551a8f7",
+    "assets/relaxation.part1.txt": "9c78970ebc247057b225c79a0552c716e9e718e21068987e4100873b380e444e",
+    "assets/relaxation.part2.txt": "4cd79aa4db5cb7186e6b68544229d68b07d67d2f54babaabfb6b8bff1ed6b1b3",
+    "assets/relaxation.part3.txt": "c9b169a445293866861fcb26f196621bdc925811ab120f2f89d83201ea5e9e03",
+    "assets/relaxation.part4.txt": "dd77bb3b829fec9265287caf03232778d1841f3d1afbff8872a86414fef23528",
+    "assets/relaxation.part5.txt": "5277e0c219f8c3f1ffff2a4e6f7579d27c2ffb9df02e31b0e7fad2928e89fd03",
+    "assets/relaxation.part6.txt": "0edba0c2334504744733cb9dafb6c92e04faae6cc1ee41c698254555da6c7815",
+    "assets/relaxation.part7.txt": "290a8bf5839991e2bf795420074ce47df9896dff4ca15d3afa941ab6c6d56765",
+    "assets/relaxation.part8.txt": "bb20dd82a8d28c38297aebf9c3d6d72201ecc882410b3a5e55de2710368123b8",
+    "assets/relaxation.part9.txt": "7a5bd10cae9936d88aac3524ca717932aa828b5a5c79528a1b70a2771847f439",
+    "assets/wave1d.part0.txt": "c7206b654498086277635985eca274f742fc5c1407b679b04a85e66b34cf71af",
+    "assets/wave1d.part1.txt": "19d68be71e0777b394141e8c2ca5c74c75a61eb1ecfdfdf64a43c966fe37fc9e",
+    "assets/wave1d.part2.txt": "62772231ab94c5e2ce1ff5bf17202cb2683d36b0b8416dbc2491fa03ab7712be",
+    "assets/wave1d.part3.txt": "efbb06cf0ae185b5ff91c4e68289aaaa3ac0d95abe1c43dad95a4ec1355230be",
+    "assets/wave1d.part4.txt": "7ea3f07a78b1c6ea2bf0f9ceecb7758f5428b9d84610d72ed60f68665bb6f246",
+    "assets/wave1d.part5.txt": "bdbe909faa22a829b0931fa97c110b6637629fcd45c830ea190213df8627f658",
+    "assets/wave1d.part6.txt": "e37e59aea714311484f6eab11c87d8e6951d9d88e7b2fdd36657e9c1d904dfd8",
+    "assets/wave1d.part7.txt": "6058961436c19932151040b9e8f617bbbd45f78e012f98fe269a3817ae86e04c",
+    "assets/wave1d.part8.txt": "b817c44323dd6446242ad6a23f6560f63b1b5a2f7a6067e41f86df9e5ad76a72",
+    "assets/wave1d.part9.txt": "3e90890dc7767b579fc1df9baad13d27637311ecfc2d6ff222d7b5f38202036b"
+  },
+  "csv_precision": "Public summary floating values rounded to four decimals; original archive retains full precision."
+}

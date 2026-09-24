@@ -1,11 +1,27 @@
-# Neural Equation Demos
+# Neural Equations for Systems with Memory
 
 Research portfolio by Haoyang Jiang, William & Mary.
 
-This directory is an independent static site, published at `/neural-equation-demos/` through the existing GitHub Pages workflow. It does not replace the personal homepage.
+Live site: https://haoyangjiang-wm.github.io/neural-equation-demos/
 
-The online edition presents a fixed, unselected test example (case 0), with three initialization seeds, for each of three computational studies. Display curves are temporally subsampled; aggregate benchmark statistics use all 64 test cases and all three seeds. The thermal field is reference simulation only, not a learned full-field prediction.
+This edition features three selected, independently confirmed numerical studies: two-dimensional diffusion sensing, multirate nonlinear relaxation, and damped wave sensing. Each includes its reference equation, the learned model description, an interactive frozen-prediction replay, and complete summary comparisons with history Neural ODEs and learned-delay Neural DDEs.
 
-Methods: Neural ODE, learned-delay Neural DDE, and a causal lag-attention neural integral equation prototype. These are exploratory numerical studies, not official full-architecture reproductions or universal superiority claims.
+The replay uses unselected confirmation case 0, all three seeds, two sensor channels, same-family and doubled-frequency inputs, and horizons T through 8T. Display samples are compressed for delivery; summary metrics use the full stored evaluations. See evidence/protocol.md and release.json for provenance and limitations.
 
-All published reference curves and predictions are drawn from the archived study, not newly generated training results.
+These are research prototypes, not official ANIE/Spectral NIE reproductions, physical measurements, or a universal superiority claim. Different featured tasks use different selected NIE kernels. Unfavorable cases and stronger DDE results remain in the evidence.
+
+This directory contains the lightweight online exports, not all 98 training checkpoints. The complete experimental archive is NIE_MultiCase_Screen_Complete.zip supplied with the original study.
+
+Validate local exports:
+
+```sh
+python3 tools/verify_publication.py --local
+```
+
+Validate published files against this checkout:
+
+```sh
+python3 tools/verify_publication.py
+```
+
+The existing repository Pages build copies this public directory without modifying the personal homepage.
