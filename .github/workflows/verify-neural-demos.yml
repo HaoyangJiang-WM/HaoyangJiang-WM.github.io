@@ -13,7 +13,7 @@ jobs:
   verify:
     if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
-    timeout-minutes: 6
+    timeout-minutes: 5
     steps:
       - name: Checkout deployed revision
         uses: actions/checkout@v4
@@ -23,8 +23,12 @@ jobs:
         run: node --check public/neural-equation-demos/assets/memory.js
       - name: Verify public files and all confirmation replay datasets
         run: python3 public/neural-equation-demos/tools/verify_publication.py
+      - name: Verify compact interface and professional CV
+        run: python3 public/neural-equation-demos/tools/verify_ui_cv.py
       - name: Save verification evidence
         uses: actions/upload-artifact@v4
         with:
           name: neural-demos-publication-check
-          path: publication-verification.json
+          path: |
+            publication-verification.json
+            interface-cv-verification.json

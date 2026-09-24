@@ -1,27 +1,18 @@
-# Neural Equations for Systems with Memory
+# Neural Equation Demos
 
-Research portfolio by Haoyang Jiang, William & Mary.
+Interactive scientific machine learning portfolio by **Haoyang Jiang**, Ph.D. researcher in Data Science at William & Mary.
 
-Live site: https://haoyangjiang-wm.github.io/neural-equation-demos/
+[Live site](https://haoyangjiang-wm.github.io/neural-equation-demos/) · [Professional CV](https://raw.githubusercontent.com/HaoyangJiang-WM/CV/main/Haoyang_Jiang_CV.pdf)
 
-This edition features three selected, independently confirmed numerical studies: two-dimensional diffusion sensing, multirate nonlinear relaxation, and damped wave sensing. Each includes its reference equation, the learned model description, an interactive frozen-prediction replay, and complete summary comparisons with history Neural ODEs and learned-delay Neural DDEs.
+The site compares neural integral models, history-encoded Neural ODEs, and learned-delay Neural DDEs on diffusion sensing, multirate relaxation, and damped-wave sensing.
 
-The replay uses unselected confirmation case 0, all three seeds, two sensor channels, same-family and doubled-frequency inputs, and horizons T through 8T. Display samples are compressed for delivery; summary metrics use the full stored evaluations. See evidence/protocol.md and release.json for provenance and limitations.
+- All reference and model curves are visible by default; each can be toggled individually.
+- Switch input family, seed, sensor, and prediction horizon from T through 8T.
+- Replay curves show fixed test case 0. Tables summarize all 64 test inputs and three seeds per configuration.
+- Reference-system equations are separate from learned-model equations. Hidden reference fields are not supplied as predictor inputs.
 
-These are research prototypes, not official ANIE/Spectral NIE reproductions, physical measurements, or a universal superiority claim. Different featured tasks use different selected NIE kernels. Unfavorable cases and stronger DDE results remain in the evidence.
+The browser uses archived predictions, not live model training. The numerical data, failure records, and benchmark coverage are preserved in `evidence/`. Full methodology and scope are in [the protocol](evidence/protocol.md).
 
-This directory contains the lightweight online exports, not all 98 training checkpoints. The complete experimental archive is NIE_MultiCase_Screen_Complete.zip supplied with the original study.
+## Maintenance
 
-Validate local exports:
-
-```sh
-python3 tools/verify_publication.py --local
-```
-
-Validate published files against this checkout:
-
-```sh
-python3 tools/verify_publication.py
-```
-
-The existing repository Pages build copies this public directory without modifying the personal homepage.
+`index.html`: page content. `assets/memory.js`: replay and controls. `assets/site.css` and `assets/compact.css`: layout. `release.json`: publication hashes. Scripts under `tools/` verify the deployed assets and the professional CV link.
