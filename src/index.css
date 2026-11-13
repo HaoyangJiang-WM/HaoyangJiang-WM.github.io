@@ -1,27 +1,140 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import url("https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&family=Spectral:wght@500;600&display=swap");
 
 :root {
   color-scheme: light;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  --text: #222724;
+  --muted: #545c57;
+  --accent: #224d3f;
+  --line: #dce1dd;
+  --heading: "Spectral", Georgia, serif;
+  font: 17px/1.6 "Source Sans 3", "Segoe UI", sans-serif;
+  color: var(--text);
+  background: #fff;
 }
 
-html {
-  scroll-behavior: smooth;
-}
-
-body {
-  margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
-  background: #ffffff;
-}
-
-button,
+* { box-sizing: border-box; }
+body { margin: 0; }
+h1, h2, h3, p, ul { margin: 0; }
 a {
-  -webkit-tap-highlight-color: transparent;
+  color: var(--accent);
+  text-underline-offset: .17em;
+  text-decoration-thickness: 1px;
+}
+a:hover { text-decoration-thickness: 2px; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+section:target { scroll-margin-top: 1.5rem; }
+
+.container {
+  width: min(100% - 3rem, 61rem);
+  margin-inline: auto;
+}
+
+.site-header { border-bottom: 1px solid var(--line); }
+.header-row, .footer-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: .6rem 2rem;
+}
+.header-row { min-height: 4.1rem; }
+.wordmark {
+  color: var(--text);
+  font: 600 1.25rem/1.3 var(--heading);
+  white-space: nowrap;
+  text-decoration: none;
+}
+nav, .inline-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .25rem 1.3rem;
+  font-size: .92rem;
+}
+nav a {
+  color: var(--muted);
+  font-weight: 600;
+  text-decoration: none;
+}
+nav a:hover { color: var(--accent); text-decoration: underline; }
+
+.layout {
+  display: grid;
+  grid-template-columns: 12.5rem minmax(0, 1fr);
+  align-items: start;
+  column-gap: clamp(2rem, 6vw, 5.1rem);
+  padding-block: 3.25rem 4rem;
+}
+.portrait {
+  display: block;
+  width: 10rem;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  object-position: center 42%;
+  border-radius: 3px;
+  background: #f1f3f1;
+}
+h1, h2 { font-family: var(--heading); font-weight: 600; }
+h1 { font-size: 1.95rem; letter-spacing: -.04em; line-height: 1.12; margin: 1.05rem 0 .45rem; }
+.affiliation, .profile-links { font-size: .94rem; }
+.affiliation { color: var(--muted); }
+.profile-links { margin-top: .95rem; }
+.inline-links { padding: 0; list-style: none; gap: .15rem .9rem; margin-top: .8rem; }
+
+.content section + section { margin-top: 1.8rem; }
+h2 {
+  font-size: 1.6rem;
+  line-height: 1.22;
+  letter-spacing: -.025em;
+  padding-bottom: .42rem;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: .65rem;
+}
+.content p + p { margin-top: .65rem; }
+.news, .publication-list { list-style: none; padding: 0; }
+.news li {
+  display: grid;
+  grid-template-columns: 4.3rem minmax(0, 1fr);
+  gap: .6rem;
+  padding-block: .18rem;
+}
+.news time { color: var(--muted); font-size: .9rem; padding-top: .11rem; }
+.publication { padding-block: .65rem; }
+.publication + .publication { border-top: 1px solid var(--line); }
+.publication h3 { font-size: 1.03rem; font-weight: 650; line-height: 1.38; }
+.publication h3 a { text-decoration: none; }
+.publication h3 a:hover { text-decoration: underline; }
+.publication .authors, .publication .publication-details {
+  margin-top: .12rem;
+  font-size: .91rem;
+  color: var(--muted);
+}
+.authors strong { font-weight: 650; color: var(--text); }
+.publication-details {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: .1rem 1rem;
+}
+
+.site-footer { border-top: 1px solid var(--line); }
+.footer-row { padding-block: 1rem; font-size: .86rem; color: var(--muted); }
+.skip-link {
+  position: absolute;
+  top: .5rem;
+  left: .5rem;
+  z-index: 1;
+  background: #fff;
+  padding: .4rem .75rem;
+  transform: translateY(-200%);
+}
+.skip-link:focus { transform: translateY(0); }
+
+@media (max-width: 43rem) {
+  .container { width: calc(100% - 2rem); }
+  .layout { grid-template-columns: 1fr; row-gap: 1.8rem; padding-block: 1.7rem 2.75rem; }
+  .profile { display: grid; grid-template-columns: 6rem minmax(0, 1fr); gap: 1.05rem; align-items: start; }
+  .portrait { width: 100%; }
+  h1 { font-size: 1.7rem; margin-top: 0; }
+  .header-row { flex-wrap: wrap; padding-block: .7rem; }
+  nav { gap: .3rem .95rem; }
+  .profile-links, .inline-links { margin-top: .45rem; }
 }

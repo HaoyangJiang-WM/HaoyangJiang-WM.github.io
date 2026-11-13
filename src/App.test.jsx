@@ -1,54 +1,31 @@
-import { describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
-import App, { navItems, PROFILE_PHOTO_SRC, publications, researchAreas, scrollToId } from "./App.jsx";
+import { describe, expect, it } from "vitest";
+import { render, screen, within } from "@testing-library/react";
+import App, { PROFILE_PHOTO_SRC } from "./App.jsx";
 
-describe("Haoyang personal homepage", () => {
-  it("renders the hero section without crashing", () => {
+describe("Haoyang Jiang's academic homepage", () => {
+  it("renders the name, affiliation, and portrait", () => {
     render(<App />);
-    expect(screen.getByTestId("homepage-root")).toBeInTheDocument();
-    expect(screen.getByText("Building AI for open physical systems.")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 1, name: "Haoyang Jiang" })).toBeInTheDocument();
+    expect(screen.getByText("Ph.D. Candidate in Data Science")).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "Portrait of Haoyang Jiang" })).toHaveAttribute("src", PROFILE_PHOTO_SRC);
   });
 
-  it("uses a white page background", () => {
+  it("links each navigation item to a section, the demos, or the CV", () => {
     render(<App />);
-    expect(screen.getByTestId("homepage-root")).toHaveClass("bg-white");
+    const nav = within(screen.getByRole("navigation", { name: "Main navigation" }));
+    for (const name of ["Research", "Publications"]) {
+      const id = nav.getByRole("link", { name }).getAttribute("href").slice(1);
+      expect(document.getElementById(id)).toBeInTheDocument();
+    }
+    expect(nav.getByRole("link", { name: "Demos" })).toHaveAttribute("href", "/neural-equation-demos/");
+    expect(nav.getByRole("link", { name: "CV" }).getAttribute("href")).toMatch(/Haoyang_Jiang_CV\.pdf$/);
   });
 
-  it("renders the profile photo with the expected source", () => {
+  it("renders publication titles with paper links", () => {
     render(<App />);
-    const photo = screen.getByAltText("Portrait of Haoyang Jiang");
-    expect(photo).toBeInTheDocument();
-    expect(photo.getAttribute("src")).toBe(PROFILE_PHOTO_SRC);
-  });
-
-  it("defines all main navigation items", () => {
-    expect(navItems).toHaveLength(5);
-    expect(navItems.map((item) => item.label)).toEqual(["Mission", "Research", "Projects", "Publications", "Contact"]);
-  });
-
-  it("renders all research areas", () => {
-    render(<App />);
-    expect(researchAreas).toHaveLength(4);
-    for (const area of researchAreas) expect(screen.getByText(area[1])).toBeInTheDocument();
-  });
-
-  it("renders selected publications", () => {
-    render(<App />);
-    expect(publications).toHaveLength(3);
-    expect(screen.getByText(/Fredholm Integral Equations Neural Operator/i)).toBeInTheDocument();
-  });
-
-  it("scrollToId safely no-ops when target does not exist", () => {
-    expect(() => scrollToId("missing-target")).not.toThrow();
-  });
-
-  it("scrollToId calls scrollIntoView when an element exists", () => {
-    const div = document.createElement("div");
-    div.id = "target";
-    div.scrollIntoView = vi.fn();
-    document.body.appendChild(div);
-    scrollToId("target");
-    expect(div.scrollIntoView).toHaveBeenCalledWith({ behavior: "smooth", block: "start" });
-    document.body.removeChild(div);
+    const publications = within(screen.getByRole("region", { name: "Selected Publications" }));
+    expect(publications.getAllByRole("listitem")).toHaveLength(6);
+    expect(publications.getByRole("link", { name: /Fredholm Integral Equations/ }))
+      .toHaveAttribute("href", "https://arxiv.org/abs/2408.12389");
   });
 });
