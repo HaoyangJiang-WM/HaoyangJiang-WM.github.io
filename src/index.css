@@ -89,6 +89,12 @@ h2 {
   margin-bottom: .65rem;
 }
 .content p + p { margin-top: .65rem; }
+.availability { color: var(--accent); }
+.availability strong { font-weight: 700; }
+.publication .publication-summary {
+  margin-top: .34rem;
+  font-size: .94rem;
+}
 .news, .publication-list { list-style: none; padding: 0; }
 .news li {
   display: grid;

@@ -18,13 +18,18 @@ describe("Haoyang Jiang's academic homepage", () => {
       expect(document.getElementById(id)).toBeInTheDocument();
     }
     expect(nav.getByRole("link", { name: "Demos" })).toHaveAttribute("href", "/neural-equation-demos/");
-    expect(nav.getByRole("link", { name: "CV" }).getAttribute("href")).toMatch(/Haoyang_Jiang_CV\.pdf$/);
+    expect(nav.getByRole("link", { name: "CV" })).toHaveAttribute("href", "/Haoyang_Jiang_CV.pdf");
+    expect(nav.getByRole("link", { name: "CV" })).not.toHaveAttribute("download");
   });
 
   it("renders publication titles with paper links", () => {
     render(<App />);
-    const publications = within(screen.getByRole("region", { name: "Selected Publications" }));
-    expect(publications.getAllByRole("listitem")).toHaveLength(6);
+    const publications = within(screen.getByRole("region", { name: "Publications" }));
+    const entries = publications.getAllByRole("listitem");
+    expect(entries).toHaveLength(6);
+    for (const entry of entries) {
+      expect(entry.querySelector(".publication-summary")).toHaveTextContent(/.+\.$/);
+    }
     expect(publications.getByRole("link", { name: /Fredholm Integral Equations/ }))
       .toHaveAttribute("href", "https://arxiv.org/abs/2408.12389");
   });

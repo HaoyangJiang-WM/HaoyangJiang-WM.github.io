@@ -2,7 +2,7 @@ import React from "react";
 
 const github = "https://github.com/HaoyangJiang-WM";
 export const PROFILE_PHOTO_SRC = "/haoyang-jiang.jpg";
-const cv = "https://raw.githubusercontent.com/HaoyangJiang-WM/CV/main/Haoyang_Jiang_CV.pdf";
+const cv = "/Haoyang_Jiang_CV.pdf";
 const scholar = "https://scholar.google.com/citations?user=q6923RoAAAAJ";
 const email = "hjiang16@wm.edu";
 
@@ -11,6 +11,7 @@ const publications = [
     title: "VTV-FM: Flow Matching through Variational Terminal-Velocity Closure",
     coauthors: "Yuheng Li, Di Yang, Yanhai Xiong, Haipeng Chen, and Yi He",
     venue: "NeurIPS 2026",
+    summary: "We help generative models create images and physical simulations by learning curved paths that can speed up and slow down.",
     paper: "https://arxiv.org/abs/2610.00785",
     code: github + "/VTV-FM",
   },
@@ -18,6 +19,7 @@ const publications = [
     title: "Physics-Refined Spatiotemporal Forecasting on Open-Boundary Hydrologic Graphs",
     coauthors: "Zhengui Wang, Shenghan Gao, Y. Joseph Zhang, Xingquan Zhu, and Yi He",
     venue: "IEEE ICDM 2026 · Best Paper Award",
+    summary: "We use river measurements and physical laws to forecast flows farther ahead, even when upstream inflows are unknown.",
     paper: "https://arxiv.org/abs/2610.01765",
     code: github + "/OpenBoundary",
   },
@@ -25,12 +27,14 @@ const publications = [
     title: "Boundary-Consistent Graph Neural Networks for Topological Flux Prediction",
     coauthors: "Bojian Qu, Xingquan Zhu, Jifu Tan, and Yi He",
     venue: "Transactions on Machine Learning Research, 2026",
+    summary: "We help models predict fluid flow through a network by estimating what enters from outside the area we can observe.",
     paper: "https://openreview.net/forum?id=31gTIfhoH0",
   },
   {
     title: "Topology-aware Neural Flux Prediction Guided by Physics",
     coauthors: "Jindong Wang, Xingquan Zhu, and Yi He",
     venue: "ICML 2025",
+    summary: "We teach models to account for flow direction and physical laws when predicting how water or traffic moves through a network.",
     paper: "https://proceedings.mlr.press/v267/jiang25i.html",
     code: github + "/PhysicsNFP",
   },
@@ -38,12 +42,14 @@ const publications = [
     title: "Fredholm Integral Equations Neural Operator (FIE-NO) for Data-Driven Boundary Value Problems",
     coauthors: "and Yongzhi Qu",
     venue: "arXiv preprint, 2024",
+    summary: "We train a model to predict how a physical system behaves inside an irregular shape from conditions along its edges.",
     paper: "https://arxiv.org/abs/2408.12389",
   },
   {
     title: "Transfer Operator Learning with Fusion Frame",
     coauthors: "and Yongzhi Qu",
     venue: "arXiv preprint, 2024",
+    summary: "We help a model reuse what it learned from one set of physics simulations to solve related problems under new conditions.",
     paper: "https://arxiv.org/abs/2408.10458",
   },
 ];
@@ -83,6 +89,7 @@ function Publication({ entry }) {
         <cite>{entry.venue}</cite>
         {entry.code && <a href={entry.code} aria-label={"Code for " + entry.title}>Code ↗</a>}
       </p>
+      <p className="publication-summary">{entry.summary}</p>
     </li>
   );
 }
@@ -109,7 +116,7 @@ export default function App() {
             <h2 id="research-title">Research</h2>
             <p>
               I am a Ph.D. candidate in Data Science at William &amp; Mary,
-              advised by <a href="https://yhe15.people.wm.edu/">Yi He</a>.
+              advised by Prof. <a href="https://yhe15.people.wm.edu/">Yi He</a>.
               I develop machine learning methods for physical systems, with
               a focus on how boundary conditions and conservation laws can
               inform the way models learn.
@@ -120,6 +127,11 @@ export default function App() {
               scientific data. I am also interested in inverse problems in
               geophysics.
             </p>
+            <p className="availability">
+              <strong>
+                I’m looking for full-time roles and internships, and I welcome research collaborations.
+              </strong>
+            </p>
           </section>
           <section id="news" aria-labelledby="news-title">
             <h2 id="news-title">News</h2>
@@ -129,7 +141,7 @@ export default function App() {
             </ul>
           </section>
           <section id="publications" aria-labelledby="publications-title">
-            <h2 id="publications-title">Selected Publications</h2>
+            <h2 id="publications-title">Publications</h2>
             <ul className="publication-list">
               {publications.map((entry) => <Publication key={entry.title} entry={entry} />)}
             </ul>
