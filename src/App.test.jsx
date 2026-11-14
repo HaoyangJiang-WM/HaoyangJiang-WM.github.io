@@ -18,7 +18,7 @@ describe("Haoyang Jiang's academic homepage", () => {
       expect(document.getElementById(id)).toBeInTheDocument();
     }
     expect(nav.getByRole("link", { name: "Demos" })).toHaveAttribute("href", "/neural-equation-demos/");
-    expect(nav.getByRole("link", { name: "CV" })).toHaveAttribute("href", "/Haoyang_Jiang_CV.pdf");
+    expect(nav.getByRole("link", { name: "CV" })).toHaveAttribute("href", "/cv/");
     expect(nav.getByRole("link", { name: "CV" })).not.toHaveAttribute("download");
   });
 

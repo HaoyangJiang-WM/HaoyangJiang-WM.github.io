@@ -2,7 +2,7 @@ import React from "react";
 
 const github = "https://github.com/HaoyangJiang-WM";
 export const PROFILE_PHOTO_SRC = "/haoyang-jiang.jpg";
-const cv = "/Haoyang_Jiang_CV.pdf";
+const cv = "/cv/";
 const scholar = "https://scholar.google.com/citations?user=q6923RoAAAAJ";
 const email = "hjiang16@wm.edu";
 
