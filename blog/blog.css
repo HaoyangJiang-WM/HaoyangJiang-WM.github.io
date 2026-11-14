@@ -1,0 +1,28 @@
+.blog-page { max-width: 47rem; padding-block: clamp(2rem, 6vw, 4rem); }
+.article-header { border-bottom: 1px solid var(--line); padding-bottom: 1.5rem; margin-bottom: 1.5rem; }
+.article-header h1 { font-size: clamp(2.15rem, 5vw, 3.7rem); margin: 0 0 .65rem; }
+.deck { font-size: 1.22rem; color: var(--muted); }
+.byline { font-size: .94rem; color: var(--muted); margin-top: .75rem; }
+.blog-page section { margin-top: 2rem; }
+.blog-page p + p { margin-top: .75rem; }
+.blog-page h3 { font: 600 1.28rem/1.4 var(--heading); margin: .9rem 0 .35rem; }
+.equation { text-align: center; font: 1.2rem/1.5 Georgia, serif; margin: 1rem 0; }
+.blog-page blockquote { margin: 1rem 0; padding: .35rem 0 .35rem 1rem; border-left: 3px solid var(--accent); font: 1.16rem/1.5 var(--heading); }
+.experiment { margin: 1.25rem 0; padding: clamp(.7rem, 3vw, 1.1rem); border: 1px solid var(--line); }
+.river { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .25rem .5rem; font-size: .85rem; color: var(--accent); }
+.river span:nth-child(odd) { border: 1px solid currentColor; padding: .18rem .36rem; }
+.river .boundary { border-style: dashed !important; color: var(--muted); }
+.controls { display: grid; grid-template-columns: 1fr minmax(7rem, .45fr); gap: 1rem; margin: 1rem 0 .65rem; font-size: .91rem; }
+.controls input, .controls select { display: block; width: 100%; margin: .35rem 0 0; accent-color: var(--accent); }
+.controls select { font: inherit; }
+.controls output { font-weight: 700; }
+.legend { display: flex; flex-wrap: wrap; gap: .2rem 1rem; padding: 0; list-style: none; font-size: .83rem; }
+.legend li::before { content: ""; display: inline-block; width: 1.2rem; margin-right: .3rem; vertical-align: middle; border-top: 2px solid currentColor; }
+.legend .high { color: #224d3f; }
+.legend .low { color: #3f4642; }
+.legend .low::before { border-top-style: dotted; }
+.legend .mean { color: #626963; }
+.legend .mean::before { border-top-style: dashed; }
+#trajectories { display: block; width: 100%; height: clamp(220px, 39vw, 310px); }
+#readout { font-size: .92rem; font-weight: 650; }
+figcaption { margin-top: .4rem; font-size: .9rem; color: var(--muted); }

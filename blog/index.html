@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="A toy river graph shows how hidden boundary forcing can produce two futures from identical observations." />
+  <link rel="canonical" href="https://haoyangjiang-wm.github.io/blog/" />
+  <link rel="stylesheet" href="/src/index.css" />
+  <link rel="stylesheet" href="./blog.css" />
+  <title>Are Graph Neural Networks Bound by Their Nodes? | Haoyang Jiang</title>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="container header-row">
+      <a class="wordmark" href="/">Haoyang Jiang</a>
+      <nav aria-label="Main navigation">
+        <a href="/">Home</a><a href="/#publications">Publications</a><a href="/blog/" aria-current="page">Blog</a><a href="/cv/">CV</a>
+      </nav>
+    </div>
+  </header>
+  <main id="main" class="container blog-page" tabindex="-1">
+    <article>
+      <header class="article-header">
+        <h1>Are Graph Neural Networks Bound by Their Nodes?</h1>
+        <p class="deck">How the same observed river network can have two different futures.</p>
+        <p class="byline"><a href="/">Haoyang Jiang</a> · William &amp; Mary · <time datetime="2026-11-14">November 14, 2026</time></p>
+      </header>
+
+      <p>Imagine two stretches of river with identical readings at every gauge. Upstream of the first stretch, a gate opens. Upstream of the second, it stays shut. At the moment we make a forecast, the observed graphs look identical. What should a graph neural network predict?</p>
+
+      <section aria-labelledby="information">
+        <h2 id="information">Where does information come from?</h2>
+        <p>In a message-passing GNN, each node updates its representation using messages from its neighbors. Stacking layers lets information from farther away reach a node. Every message still traces back to inputs the model received, such as node measurements, edge attributes, or a forcing variable supplied separately.</p>
+        <p>Suppose a deterministic predictor receives just the observed graph <var>G</var> and its current state <var>X</var><sub><var>t</var></sub>. Its forecast is</p>
+        <div class="equation">X̂<sub>t+1</sub> = F<sub>θ</sub>(X<sub>t</sub>, G).</div>
+        <p>For fixed parameters, identical inputs yield the same forecast. More layers can move available information farther along the graph. The upstream gate setting is absent from those inputs.</p>
+      </section>
+
+      <section aria-labelledby="open">
+        <h2 id="open">What happens when the graph is open?</h2>
+        <p>The observed graph ends at the first gauge, but the river continues upstream. An external input <var>B</var><sub><var>t</var></sub> can cross that boundary and change the observed state. The physical update now depends on <var>X</var><sub><var>t</var></sub>, <var>G</var>, and <var>B</var><sub><var>t</var></sub>.</p>
+        <div class="equation">X<sub>t+1</sub> = Φ(X<sub>t</sub>, G, B<sub>t</sub>).</div>
+        <blockquote>A graph defines which nodes can exchange information, but it does not necessarily define where the information governing their dynamics originates.</blockquote>
+        <h3>A three-gauge toy experiment</h3>
+        <p>All three gauges start at zero in both scenarios. At every step, each gauge keeps half its current signal and takes half from its upstream neighbor. The first gauge takes that upstream value from the boundary, which is held at zero in one scenario and at the slider value in the other.</p>
+        <div class="equation">x<sub>i</sub>(t+1) = ½ x<sub>i</sub>(t) + ½ x<sub>i−1</sub>(t), &nbsp; x<sub>0</sub>(t) = B.</div>
+        <figure class="experiment">
+          <div class="river" role="img" aria-label="An unobserved upstream boundary feeds three observed gauges in order">
+            <span class="boundary">Boundary</span><span aria-hidden="true">→</span><span>Gauge 1</span><span aria-hidden="true">→</span><span>Gauge 2</span><span aria-hidden="true">→</span><span>Gauge 3</span>
+          </div>
+          <div class="controls">
+            <label for="forcing">High boundary input <output id="forcing-value" for="forcing">1.0</output><input id="forcing" type="range" min="0" max="2" step="0.1" value="1" /></label>
+            <label for="gauge">Observed gauge<select id="gauge"><option value="0">Gauge 1</option><option value="1" selected>Gauge 2</option><option value="2">Gauge 3</option></select></label>
+          </div>
+          <ul class="legend" aria-label="Chart legend"><li class="high">High input</li><li class="low">Zero input</li><li class="mean">Input-blind mean</li></ul>
+          <canvas id="trajectories" role="img" aria-label="Gauge signal by forecast step">At gauge 2, the zero and high-input trajectories first separate at step 2.</canvas>
+          <p id="readout" aria-live="polite">At step 8, gauge 2 reads 0.000 with zero input and 0.965 with high input.</p>
+          <figcaption>The three curves are computed from the recurrence. The dashed curve is the optimal squared-error point forecast when the two boundary scenarios are equally likely and the input is hidden.</figcaption>
+          <noscript><p>With high input set to 1, the first difference reaches gauges 1, 2, and 3 at steps 1, 2, and 3, respectively.</p></noscript>
+        </figure>
+        <p>At gauge 2, the readings first diverge after two steps, the time it takes for the signal to cross two links. At any horizon where the two possible readings are <var>y</var><sub>0</sub> and <var>y</var><sub>1</sub>, a predictor given only the common initial state must return the same value for both scenarios. For equally likely scenarios, the midpoint minimizes expected squared error, and the minimum is ( <var>y</var><sub>1</sub> − <var>y</var><sub>0</sub> )² / 4. Even the best point forecast under that loss can miss both physical outcomes.</p>
+      </section>
+
+      <section aria-labelledby="discussion">
+        <h2 id="discussion">Discussion</h2>
+        <p>This ambiguity comes from the information available at forecast time. It applies to any predictor with the same inputs. Message passing makes the modeling choice especially visible because the graph is often the only path through which the physical state is represented. In the toy experiment, the boundary input is supplied by design to the simulator, while the forecast given only the initial graph sees neither scenario label.</p>
+        <p>When upstream measurements or control schedules are available, they can enter through an explicit boundary input. When earlier sensor readings contain clues about the forcing, a model can try to infer a latent boundary state from history. If two forcing scenarios remain indistinguishable even with that history, a predictive distribution can represent both futures and communicate the uncertainty.</p>
+        <p>For a hydrologic application, see <a href="https://arxiv.org/abs/2610.01765">Physics-Refined Spatiotemporal Forecasting on Open-Boundary Hydrologic Graphs</a>. That work uses learned boundary proxies and physics-guided refinement for long-horizon prediction.</p>
+      </section>
+    </article>
+  </main>
+  <footer class="site-footer"><div class="container footer-row"><a href="/">← Back to homepage</a><a href="#main">Back to top ↑</a></div></footer>
+  <script type="module" src="./toy.js"></script>
+</body>
+</html>

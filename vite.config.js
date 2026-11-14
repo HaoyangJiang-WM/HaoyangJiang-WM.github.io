@@ -10,6 +10,7 @@ export default defineConfig({
       input: {
         home: fileURLToPath(new URL("./index.html", import.meta.url)),
         cv: fileURLToPath(new URL("./cv/index.html", import.meta.url)),
+        blog: fileURLToPath(new URL("./blog/index.html", import.meta.url)),
       },
     },
   },

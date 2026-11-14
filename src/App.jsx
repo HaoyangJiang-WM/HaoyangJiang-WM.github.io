@@ -114,6 +114,7 @@ export default function App() {
           <nav aria-label="Main navigation">
             <a href="#research">Research</a>
             <a href="#publications">Publications</a>
+            <a href="/blog/">Blog</a>
             <a href={cv}>CV</a>
           </nav>
         </div>
