@@ -54,6 +54,13 @@ const publications = [
     summary: "We help a model reuse what it learned from one set of physics simulations to solve related problems under new conditions.",
     paper: "https://arxiv.org/abs/2408.10458",
   },
+  {
+    title: "Orbital error propagation considering atmospheric density uncertainty",
+    coauthors: "Ming-Jiang Zhang, Hong-Bo Wang, and Jian-Ning Xiong",
+    venue: "Advances in Space Research, 2023",
+    summary: "We study how uncertainty about the density of the upper atmosphere affects predictions of where satellites will be.",
+    paper: "https://doi.org/10.1016/j.asr.2022.11.008",
+  },
 ];
 
 function Profile() {

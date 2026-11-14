@@ -29,7 +29,7 @@ describe("Haoyang Jiang's academic homepage", () => {
     expect(screen.getByRole("link", { name: "IEEE ICDM Best Paper Award" }))
       .toHaveAttribute("href", "https://icdm2026.neu.edu.cn/");
     const entries = publications.getAllByRole("listitem");
-    expect(entries).toHaveLength(6);
+    expect(entries).toHaveLength(7);
     for (const entry of entries) {
       const paper = within(entry).getByRole("link", { name: /^Paper for / });
       const code = within(entry).queryByRole("link", { name: /^Code for / });
