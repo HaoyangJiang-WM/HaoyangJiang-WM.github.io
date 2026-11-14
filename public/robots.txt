@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://haoyangjiang-wm.github.io/sitemap.xml
