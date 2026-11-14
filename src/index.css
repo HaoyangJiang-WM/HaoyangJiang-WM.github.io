@@ -21,6 +21,7 @@ a {
   text-decoration-thickness: 1px;
 }
 a:hover { text-decoration-thickness: 2px; }
+.award-link { color: #9f2331; font-weight: 700; }
 a:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 section:target { scroll-margin-top: 1.5rem; }
 
