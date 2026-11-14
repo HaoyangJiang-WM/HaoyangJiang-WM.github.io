@@ -43,9 +43,9 @@ const publications = [
   {
     title: "Fredholm Integral Equations Neural Operator (FIE-NO) for Data-Driven Boundary Value Problems",
     coauthors: "and Yongzhi Qu",
-    venue: "arXiv preprint, 2024",
+    venue: "Machine Learning: Engineering, 2026",
     summary: "We train a model to predict how a physical system behaves inside an irregular shape from conditions along its edges.",
-    paper: "https://arxiv.org/abs/2408.12389",
+    paper: "https://doi.org/10.1088/3049-4761/ae4983",
   },
   {
     title: "Transfer Operator Learning with Fusion Frame",

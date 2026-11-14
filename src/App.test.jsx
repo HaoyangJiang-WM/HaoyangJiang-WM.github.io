@@ -38,6 +38,6 @@ describe("Haoyang Jiang's academic homepage", () => {
       expect(entry.querySelector(".publication-summary")).toHaveTextContent(/.+\.$/);
     }
     expect(publications.getByRole("link", { name: /^Fredholm Integral Equations/ }))
-      .toHaveAttribute("href", "https://arxiv.org/abs/2408.12389");
+      .toHaveAttribute("href", "https://doi.org/10.1088/3049-4761/ae4983");
   });
 });
