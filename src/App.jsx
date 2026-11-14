@@ -5,6 +5,7 @@ export const PROFILE_PHOTO_SRC = "/haoyang-jiang.jpg";
 const cv = "/cv/";
 const scholar = "https://scholar.google.com/citations?user=q6923RoAAAAJ";
 const email = "hjiang16@wm.edu";
+const icdm = "https://icdm2026.neu.edu.cn/";
 
 const publications = [
   {
@@ -18,7 +19,8 @@ const publications = [
   {
     title: "Physics-Refined Spatiotemporal Forecasting on Open-Boundary Hydrologic Graphs",
     coauthors: "Zhengui Wang, Shenghan Gao, Y. Joseph Zhang, Xingquan Zhu, and Yi He",
-    venue: "IEEE ICDM 2026 · Best Paper Award",
+    venue: "IEEE ICDM 2026",
+    award: { label: "Best Paper Award", href: icdm },
     summary: "We use river measurements and physical laws to forecast flows farther ahead, even when upstream inflows are unknown.",
     paper: "https://arxiv.org/abs/2610.01765",
     code: github + "/OpenBoundary",
@@ -86,7 +88,8 @@ function Publication({ entry }) {
         <strong>Haoyang Jiang</strong>{entry.coauthors.startsWith("and ") ? " " : ", "}{entry.coauthors}
       </p>
       <p className="publication-details">
-        <cite>{entry.venue}</cite>
+        <cite>{entry.venue}{entry.award && <> · <a href={entry.award.href}>{entry.award.label}</a></>}</cite>
+        <a href={entry.paper} aria-label={"Paper for " + entry.title}>Paper ↗</a>
         {entry.code && <a href={entry.code} aria-label={"Code for " + entry.title}>Code ↗</a>}
       </p>
       <p className="publication-summary">{entry.summary}</p>
@@ -104,7 +107,6 @@ export default function App() {
           <nav aria-label="Main navigation">
             <a href="#research">Research</a>
             <a href="#publications">Publications</a>
-            <a href="/neural-equation-demos/">Demos</a>
             <a href={cv}>CV</a>
           </nav>
         </div>
@@ -136,7 +138,7 @@ export default function App() {
           <section id="news" aria-labelledby="news-title">
             <h2 id="news-title">News</h2>
             <ul className="news">
-              <li><time dateTime="2026-10">Oct 2026</time><span>Our work on open-boundary hydrologic forecasting received the <a href="https://yhe15.people.wm.edu/publication.html">IEEE ICDM Best Paper Award</a>.</span></li>
+              <li><time dateTime="2026-10">Oct 2026</time><span>Our work on open-boundary hydrologic forecasting received the <a href={icdm}>IEEE ICDM Best Paper Award</a>.</span></li>
               <li><time dateTime="2026-09">Sep 2026</time><span><a href="https://arxiv.org/abs/2610.00785">VTV-FM</a> was accepted at NeurIPS 2026.</span></li>
             </ul>
           </section>

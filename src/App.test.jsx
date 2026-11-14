@@ -10,14 +10,15 @@ describe("Haoyang Jiang's academic homepage", () => {
     expect(screen.getByRole("img", { name: "Portrait of Haoyang Jiang" })).toHaveAttribute("src", PROFILE_PHOTO_SRC);
   });
 
-  it("links each navigation item to a section, the demos, or the CV", () => {
+  it("links to the HTML CV and keeps demos out of the main navigation", () => {
     render(<App />);
     const nav = within(screen.getByRole("navigation", { name: "Main navigation" }));
     for (const name of ["Research", "Publications"]) {
       const id = nav.getByRole("link", { name }).getAttribute("href").slice(1);
       expect(document.getElementById(id)).toBeInTheDocument();
     }
-    expect(nav.getByRole("link", { name: "Demos" })).toHaveAttribute("href", "/neural-equation-demos/");
+    expect(nav.queryByRole("link", { name: "Demos" })).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Neural Equation Demos" })).toHaveAttribute("href", "/neural-equation-demos/");
     expect(nav.getByRole("link", { name: "CV" })).toHaveAttribute("href", "/cv/");
     expect(nav.getByRole("link", { name: "CV" })).not.toHaveAttribute("download");
   });
@@ -25,12 +26,18 @@ describe("Haoyang Jiang's academic homepage", () => {
   it("renders publication titles with paper links", () => {
     render(<App />);
     const publications = within(screen.getByRole("region", { name: "Publications" }));
+    expect(screen.getByRole("link", { name: "IEEE ICDM Best Paper Award" }))
+      .toHaveAttribute("href", "https://icdm2026.neu.edu.cn/");
     const entries = publications.getAllByRole("listitem");
     expect(entries).toHaveLength(6);
     for (const entry of entries) {
+      const paper = within(entry).getByRole("link", { name: /^Paper for / });
+      const code = within(entry).queryByRole("link", { name: /^Code for / });
+      expect(paper).toHaveAttribute("href", entry.querySelector("h3 a").getAttribute("href"));
+      if (code) expect(paper.compareDocumentPosition(code) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
       expect(entry.querySelector(".publication-summary")).toHaveTextContent(/.+\.$/);
     }
-    expect(publications.getByRole("link", { name: /Fredholm Integral Equations/ }))
+    expect(publications.getByRole("link", { name: /^Fredholm Integral Equations/ }))
       .toHaveAttribute("href", "https://arxiv.org/abs/2408.12389");
   });
 });
