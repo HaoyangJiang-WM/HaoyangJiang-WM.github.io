@@ -78,19 +78,20 @@ window.MathJax = {
         <p class="byline"><a href="/">Haoyang Jiang</a> · William &amp; Mary · Published <time datetime="2026-11-14">November 14, 2026</time> · Updated <time datetime="2026-11-16">November 16, 2026</time></p>
       </header>
 
-      <p>Imagine modeling two connected reservoirs. We retain their water levels and the pipe between them, draw two vertices and one edge, and call the result our graph. Yet both reservoirs also exchange water with a third reservoir outside the region we chose to represent.</p>
-      <p>We can remove that exterior reservoir from the <em>representation</em>. We cannot make its physical effects disappear by deleting its vertex. The deeper question is not simply whether we have missed an external input. It is this: <strong>what replaces an environment when its internal states are no longer represented?</strong> A prescribed signal? A fixed boundary condition? An effective connection? An evolving response that remembers the past?</p>
+      <p>To represent a system as a graph, we choose a set of entities and a set of relations. That choice tells us <em>what is inside our representation</em>. It does not tell us whether the represented system is isolated from everything left outside.</p>
+      <p>This distinction becomes consequential when a graph is used to predict dynamics. The observed vertices may be influenced by processes that are not represented as vertices, by interactions that cross the chosen boundary, and by an environment that responds to the system itself. None of these effects disappears when its external nodes disappear from our data.</p>
       <blockquote>Choosing the nodes of a graph chooses what we represent. It does not, by itself, choose a physically valid model of everything we leave out.</blockquote>
-      <p>This post examines that distinction through graph reduction, boundary ports and one small reproducible dynamical system. It is a synthesis of existing mathematics, not a claim that graph neural networks are intrinsically incapable of accepting external information.</p>
+      <p>The underlying question is therefore not whether a graph neural network can attach another feature to a node. Of course it can. It is <strong>what relationship we assume between the graph we represent and the world we do not.</strong></p>
+      <p>This post develops that idea from the mathematics of open systems. It distinguishes a graph's <em>representation boundary</em> from the boundary of its <em>physical influence</em>, asks what survives when we eliminate the exterior, and identifies the different questions this creates for learning.</p>
 
       <nav class="article-toc" aria-label="On this page">
         <strong>Contents</strong>
         <a href="#what-a-graph-cuts">1. What a graph leaves out</a>
         <a href="#three-cuts">2. Delete, clamp, or eliminate?</a>
         <a href="#dynamic-exterior">3. When the exterior has dynamics</a>
-        <a href="#circuit-ports">4. A circuit example: boundary-aware Laplacians</a>
-        <a href="#ports">5. What physical ports contribute</a>
-        <a href="#explore">6. Interactive experiment</a>
+        <a href="#circuit-ports">4. What survives beyond the graph?</a>
+        <a href="#ports">5. Open graphs: interfaces as representations</a>
+        <a href="#explore">6. A minimal thought experiment</a>
         <a href="#learning">7. What can a learner actually know?</a>
         <a href="#evaluation">8. What should we test?</a>
         <a href="#references">References</a>
@@ -136,34 +137,47 @@ window.MathJax = {
       </section>
 
       <section aria-labelledby="circuit-ports">
-        <h2 id="circuit-ports">4. A direct graph-learning precedent: circuit boundary ports</h2>
-        <p>A recent example makes this issue concrete. <a href="https://doi.org/10.1587/nolta.17.1146" target="_blank" rel="noopener noreferrer">Suzuki and Hisakado (2026)</a> construct boundary-aware graph representations and spectral GNNs for electrical circuits. Their external port terminations change the physical graph operator even when the internal vertices and edges remain unchanged.</p>
-        <div class="math-display">\[\mathbf{L}_{b}(\omega)=\mathbf{L}_{G}+\mathcal{B}(\omega)\]</div>
-        <p>In their setup, the matrix-valued correction \(\mathcal{B}(\omega)\) represents frequency-dependent port admittances. The spectral basis built from \(\mathbf{L}_{b}\) can therefore differ from that of the ordinary Laplacian \(\mathbf{L}_{G}\). Their experiments concern synthetic circuits and fault-current/source estimation; they do <strong>not</strong> demonstrate a general solution for unobserved future forcing or arbitrary graph dynamics.</p>
-        <p>A general linear network reveals why effective operators and effective excitations should be distinguished. In the following frequency-domain circuit equations, \(\mathbf{v}_I(\omega)\) and \(\mathbf{v}_E(\omega)\) denote retained and exterior voltage phasors, and \(\mathbf{j}_I(\omega)\) and \(\mathbf{j}_E(\omega)\) denote current-source phasors:</p>
-        <div class="math-display">\[\begin{bmatrix}\mathbf{Y}_{II}&\mathbf{Y}_{IE}\\\mathbf{Y}_{EI}&\mathbf{Y}_{EE}\end{bmatrix}\begin{bmatrix}\mathbf{v}_I\\\mathbf{v}_E\end{bmatrix}=\begin{bmatrix}\mathbf{j}_{I}\\\mathbf{j}_{E}\end{bmatrix}\]</div>
-        <p>When \(\mathbf{Y}_{EE}\) is invertible, eliminating the exterior yields</p>
-        <div class="math-display">\[\mathbf{Y}_{\mathrm{eff}}=\mathbf{Y}_{II}-\mathbf{Y}_{IE}\mathbf{Y}_{EE}^{-1}\mathbf{Y}_{EI}\]</div>
-        <div class="math-display">\[\mathbf{j}_{\mathrm{eff}}=\mathbf{j}_{I}-\mathbf{Y}_{IE}\mathbf{Y}_{EE}^{-1}\mathbf{j}_{E}\]</div>
-        <p>Consequently, the retained circuit satisfies</p>
-        <div class="math-display">\[\mathbf{Y}_{\mathrm{eff}}(\omega)\mathbf{v}_I(\omega)=\mathbf{j}_{\mathrm{eff}}(\omega).\]</div>
-        <p><strong>The first expression changes the effective internal operator; the second changes the effective driving term.</strong> Known terminal admittance does not imply that the particular external excitation is known. An exterior that couples multiple ports can also induce nonlocal off-diagonal terminal responses, whereas independent port terminations may give a diagonal correction.</p>
-        <p>This prior work matters for framing: boundary-aware graph learning already exists. The open question here is not whether GNNs can <em>ever</em> accept ports; it is how graph representations, physical boundary models and actually observed boundary information should be distinguished.</p>
+        <h2 id="circuit-ports">4. What survives when the exterior is left out?</h2>
+        <p>Leaving an exterior region outside the graph does not specify how that region should be treated. Three logically distinct effects may remain, even when none of the exterior's internal nodes is explicitly represented.</p>
+        <div class="comparison-grid">
+          <div>
+            <h3>Effective relations</h3>
+            <p>The omitted environment changes how retained states influence one another. A reduced system may acquire new couplings between nodes that have no direct edge in the observed subgraph.</p>
+          </div>
+          <div>
+            <h3>External driving</h3>
+            <p>The environment can inject a signal or intervention that is not determined by the current retained state. Knowing the graph's internal connectivity does not tell us the value of that signal.</p>
+          </div>
+          <div>
+            <h3>Dynamic feedback</h3>
+            <p>The exterior may react to the retained system and later feed back the effects of its history. Eliminating the exterior can therefore produce memory rather than a fixed boundary value.</p>
+          </div>
+        </div>
+        <p>These are not competing names for the same phenomenon. An effective <em>operator</em> describes a relationship, an external <em>forcing</em> describes a realized influence, and <em>memory</em> describes dependence on past interaction. A physical model can involve more than one of them.</p>
+        <p>A useful principle follows: <strong>the absence of external nodes does not imply the absence of external structure.</strong> Such structure may be represented by interface laws, reduced operators, latent dynamics, or uncertainty, depending on what is known and what the task requires.</p>
+        <p>This is why boundary-aware graph learning is already a meaningful part of the literature. For example, <a href="https://doi.org/10.1587/nolta.17.1146" target="_blank" rel="noopener noreferrer">Suzuki and Hisakado (2026)</a> show, in a specific physical setting, that external boundary conditions can alter the graph operator and the basis used by a spectral GNN. Their result supports the broader conceptual distinction; our question here is not tied to their particular physical variables or architecture.</p>
       </section>
 
       <section aria-labelledby="ports">
-        <h2 id="ports">5. What mathematical physics contributes: explicit interfaces</h2>
-        <p>The theory of <a href="https://doi.org/10.1137/110840091" target="_blank" rel="noopener noreferrer">port-Hamiltonian systems on graphs</a> distinguishes internal connections from boundary flow/effort pairs. The boundary vertices remain part of the mathematical graph; the external interaction variables carry their own physical meaning.</p>
-        <p>For a storage system with state \(\mathbf{x}\), stored energy \(H(\mathbf{x})\) and appropriately paired port variables \((\mathbf{u},\mathbf{y})\), a common passive-system balance is</p>
-        <div class="math-display">\[\frac{\mathrm dH}{\mathrm dt}=-\mathcal{D}(\mathbf{x})+\mathbf{y}^{\mathsf T}\mathbf{u},\qquad\mathcal{D}(\mathbf{x})\ge0\]</div>
-        <p>The final term is power crossing the modeled boundary. It is <strong>not</strong> Shannon information and should not be treated as an arbitrary neural message. The lesson is structural: <em>one can model an interaction with the exterior without unfolding the entire exterior network</em>.</p>
-        <p>Ports also require a termination law. An imposed source, a passive load, and another dynamical system can connect to the same interface but produce different dynamics. A low-dimensional port does not mean the unmodeled environment has only a low-dimensional internal state.</p>
-        <p>This is consistent with compositional approaches to networks; for example, <a href="https://proceedings.mlr.press/v211/neary23a.html" target="_blank" rel="noopener noreferrer">Neary and Topcu (2023)</a> already explore compositional learning with port-Hamiltonian neural networks. We should not present subsystem learning or port-based modeling as uncharted territory.</p>
+        <h2 id="ports">5. Open graphs: making the outside an explicit interface</h2>
+        <p>Mathematical physics has long treated networks as <em>open systems</em>. Its key move is conceptual: define the internal network, identify the places where it interacts with its surroundings, and state which variables or relations govern those interactions.</p>
+        <p>In <a href="https://doi.org/10.1137/110840091" target="_blank" rel="noopener noreferrer">port-Hamiltonian systems on graphs</a>, this separation is made precise through boundary ports and conservation-compatible interconnections. An interface is not an assertion that every external entity must become an extra internal node. Rather, it describes how the represented subsystem can exchange influence with something outside it.</p>
+        <p>That viewpoint gives us three important distinctions:</p>
+        <table class="blog-table">
+          <thead><tr><th>What we know</th><th>What it does not automatically tell us</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Internal topology</strong>: which retained entities are related</td><td>The external interactions acting on those entities</td></tr>
+            <tr><td><strong>Boundary law</strong>: how an interface responds</td><td>The actual external input realized in a particular forecast</td></tr>
+            <tr><td><strong>Boundary observations</strong>: what has been measured</td><td>Whether the unknown exterior dynamics can be uniquely recovered</td></tr>
+          </tbody>
+        </table>
+        <p>Existing work already develops individual pieces, including mixed-boundary graph PDE solvers (<a href="https://proceedings.neurips.cc/paper_files/paper/2022/hash/93476ae409ae3246e22a9d4b931f84ed-Abstract-Conference.html" target="_blank" rel="noopener noreferrer">Horie and Mitsume, 2022</a>) and compositional port-based learning (<a href="https://proceedings.mlr.press/v211/neary23a.html" target="_blank" rel="noopener noreferrer">Neary and Topcu, 2023</a>). The purpose of bringing them together here is not to claim a new algorithm, but to ask whether <strong>external interaction should be made explicit when we define a graph learning problem</strong>.</p>
+        <blockquote>A graph describes internal relationships. An open-system representation also asks how the outside can act on the inside.</blockquote>
       </section>
 
       <section aria-labelledby="explore">
-        <h2 id="explore">6. One retained graph, four models of the outside world</h2>
-        <p>Take two retained reservoirs linked by a conductance of 1/4. Each also connects by conductance one to a shared exterior reservoir of storage capacity τ. Start from retained state \(\mathbf{x}(0)=(2,0)^{\mathsf T}\) and exterior state \(z(0)=0\). The exterior-capacity slider below changes the <em>physical system</em>, while all four curves retain the same two-node graph.</p>
+        <h2 id="explore">6. A minimal thought experiment: same graph, different boundaries</h2>
+        <p>To make the distinction testable, consider a minimal linear network: two retained states are coupled to each other and to one omitted state. Its exterior response time is controlled by \(\tau\). Changing \(\tau\) changes the physical system, while all four models below retain the same observed two-node graph. The numerical setup uses internal conductance \(1/4\), two exterior links of conductance \(1\), and initial state \(\mathbf{x}(0)=(2,0)^{\mathsf T}\), \(z(0)=0\).</p>
         <figure class="experiment boundary-explorer">
           <div class="controls">
             <label for="tau">Exterior storage capacity \(\tau\) <output id="tau-value" for="tau">1.00</output><input id="tau" type="range" min="0.02" max="3" step="0.02" value="1"></label>
@@ -253,7 +267,7 @@ window.MathJax = {
           <li>Neary &amp; Topcu (2023). <a href="https://proceedings.mlr.press/v211/neary23a.html" target="_blank" rel="noopener noreferrer">Compositional Learning of Dynamical System Models Using Port-Hamiltonian Neural Networks</a>. <em>L4DC</em>.</li>
           <li>Suzuki &amp; Hisakado (2026). <a href="https://doi.org/10.1587/nolta.17.1146" target="_blank" rel="noopener noreferrer">Graph neural networks with boundary conditions based on ports in electrical circuits</a>. <em>Nonlinear Theory and Its Applications, IEICE</em>.</li>
         </ol>
-        <p class="method-note"><strong>Scope and provenance.</strong> The two-reservoir traces and the three-gauge interactive experiment follow specified toy equations; they are not experiments from the cited papers, and no neural network was trained here. The literature is used for context and interpretation, not to claim that the synthesis introduces a new theorem or a new standard field named “Open Graph Learning.”</p>
+        <p class="method-note"><strong>Scope and provenance.</strong> The minimal linear-network traces and three-gauge interactive experiment follow specified toy equations; they are not experiments from the cited papers, and no neural network was trained here. The literature is used for context and interpretation, not to claim that the synthesis introduces a new theorem or a new standard field named “Open Graph Learning.”</p>
       </section>
     </article>
   </main>
