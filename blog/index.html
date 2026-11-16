@@ -56,7 +56,7 @@ window.MathJax = {
   options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'] }
 };
 </script>
-<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js"></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -291,12 +291,13 @@ window.MathJax = {
    ctx.font='12px "Source Sans 3", "Segoe UI", sans-serif';ctx.fillStyle='#59645f';ctx.textAlign='right';
    for(const y of [0,.5,1,1.5,2]){ctx.strokeStyle='#e0e5e2';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(left,yp(y));ctx.lineTo(right,yp(y));ctx.stroke();ctx.fillText(String(y),left-7,yp(y)+4);}
    ctx.textAlign='center';for(const t of [0,1,2,3,4])ctx.fillText(String(t),xp(t),bottom+17);
-   ctx.fillText('Time', (left+right)/2,h-8);ctx.textAlign='left';ctx.fillText('State x₁',6,12);
+   ctx.fillText('Time', (left+right)/2,h-8);ctx.textAlign='left';ctx.fillText('Node 1 state',6,12);
    for(const line of models){ctx.strokeStyle=line.color;ctx.lineWidth=2.45;ctx.setLineDash(line.dash);ctx.beginPath();for(let j=0;j<=200;j++){const t=4*j/200;const y=line.fn(t,tau); if(j===0)ctx.moveTo(xp(t),yp(y));else ctx.lineTo(xp(t),yp(y));}ctx.stroke();}
    ctx.setLineDash([]);
  }
  slider.addEventListener('input',draw);
  if(typeof ResizeObserver!=='undefined')new ResizeObserver(draw).observe(canvas);else window.addEventListener('resize',draw);
+ if(document.fonts && document.fonts.ready)document.fonts.ready.then(draw).catch(()=>{});
  draw();
 })();
 </script>
