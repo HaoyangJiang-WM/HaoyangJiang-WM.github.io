@@ -9,21 +9,23 @@
   <link rel="stylesheet" href="./blog.css" />
   <title>A Graph Is Not a Closed System | Haoyang Jiang</title>
 <style>
+/* Keep Source Sans 3 body, Spectral headings, and one TeX-style mathematical renderer. */
 .blog-page { max-width: 54rem; }
 .blog-page p { line-height: 1.76; }
 .blog-page section { margin-top: 3.1rem; }
 .blog-page h2 { scroll-margin-top: 1.5rem; }
 .blog-page h3 { margin-top: 1.45rem; }
 .eyebrow { color: var(--muted); font-size: .78rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; }
-.article-toc { display: grid; gap: .27rem; padding: 1.1rem 1.25rem; border: 1px solid var(--line); margin: 2rem 0 2.8rem; background: color-mix(in srgb, var(--surface, #fff) 95%, #7f91a4); }
+.article-toc { display: grid; gap: .27rem; padding: 1.1rem 1.25rem; border: 1px solid var(--line); margin: 2rem 0 2.8rem; background: #f7f9f7; }
 .article-toc strong { margin-bottom: .35rem; }
 .article-toc a { font-size: .93rem; }
-.equation { padding: .65rem .35rem; overflow-x: auto; white-space: nowrap; font-family: "Cambria Math", "STIX Two Math", Georgia, serif; font-size: 1.17rem; }
-.equation-wide { font-size: 1.01rem; }
+.math-display { margin: 1.25rem 0; padding: .75rem .45rem; overflow-x: auto; overflow-y: hidden; font-size: 1.02rem; text-align: center; line-height: 1.55; }
+.math-display mjx-container[display="true"] { margin: .35em 0 !important; max-width: 100%; }
+.blog-page mjx-container:not([display="true"]) { font-size: 1.01em !important; }
 .comparison-grid { display: grid; gap: .65rem; grid-template-columns: repeat(3,minmax(0,1fr)); margin: 1.5rem 0; }
 .comparison-grid > div { border: 1px solid var(--line); padding: 1rem .8rem; }
 .comparison-grid h3 { font-size: 1.04rem; margin-top: 0; }
-.comparison-grid .equation { font-size: .93rem; white-space: normal; }
+.comparison-grid .math-display { font-size: .9rem; margin: .8rem -.25rem; padding: .4rem .1rem; }
 .comparison-grid p { font-size: .91rem; line-height: 1.55; }
 .blog-table { width: 100%; border-collapse: collapse; font-size: .94rem; margin: 1.4rem 0; }
 .blog-table th, .blog-table td { text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); padding: .7rem .55rem; }
@@ -44,9 +46,17 @@
   .comparison-grid { grid-template-columns: 1fr; }
   .boundary-explorer .controls { grid-template-columns: 1fr; }
   #closures { height: 240px; }
-  .equation { font-size: .98rem; }
+  .math-display { text-align: left; font-size: .95rem; }
+  .comparison-grid .math-display { text-align: center; }
 }
 </style>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']], processEscapes: true },
+  options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'] }
+};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -88,30 +98,26 @@
 
       <section aria-labelledby="what-a-graph-cuts">
         <h2 id="what-a-graph-cuts">1. What a graph leaves out</h2>
-        <p>A graph <var>G</var> = (<var>V</var>, <var>E</var>) specifies which entities and relations we retain. A graph predictor may receive these relations, the observed state <var>X</var>, and perhaps a history of such states. For fixed parameters, a deterministic predictor necessarily gives the same output for the same inputs.</p>
-        <div class="equation" role="math" aria-label="Forecast X hat at time t plus h equals F theta of graph G and observed history">X̂<sub>t+h</sub> = F<sub>θ</sub>(G, X<sub>t−k:t</sub>).</div>
-        <p>But drawing a finite graph is not the same as declaring that it is dynamically closed. If the retained vertices are a subset <var>V</var> of a larger physical network, interactions crossing from the omitted exterior <var>W</var> into <var>V</var> still exist. The induced subgraph does not, by itself, tell us what happens at that cut.</p>
+        <p>A graph \(G=(V,E)\) specifies which entities and relations we retain. A graph predictor may receive these relations, the observed state \(\mathbf{x}\), and perhaps a history of such states. For fixed parameters, a deterministic predictor necessarily gives the same output for the same inputs.</p>
+        <div class="math-display">\[\widehat{\mathbf{x}}_{t+h}=F_\theta\!\left(G,\mathbf{x}_{t-k:t}\right)\]</div>
+        <p>But drawing a finite graph is not the same as declaring that it is dynamically closed. If the retained vertices are a subset \(V\) of a larger physical network, interactions crossing from the omitted exterior \(W\) into \(V\) still exist. The induced subgraph does not, by itself, tell us what happens at that cut.</p>
         <p><strong>Where does information come from?</strong> The modeled state may be affected by internal interactions, observed boundary inputs, and unobserved exterior processes. These are different sources of physical influence. Their distinction is easy to lose when all data are packed into a single node-feature tensor.</p>
         <p>Nodes are not the problem: a neural network can attach a boundary measurement to an existing node, use global features, or employ an auxiliary state. The problem is whether the relevant boundary mechanism—and the information available at prediction time—has been specified.</p>
       </section>
 
       <section aria-labelledby="three-cuts">
         <h2 id="three-cuts">2. Three ways to cut the same physical network</h2>
-        <p>Consider linear diffusion on a finite undirected conductance network. Partition the full state into retained states <var>x</var> and exterior states <var>z</var>. With unit interior storage capacity and a positive exterior capacity τ, write</p>
-        <div class="equation" role="math" aria-label="x dot equals minus A x plus C z; tau z dot equals C transpose x minus D z">
-          ẋ = −Ax + Cz, &nbsp;&nbsp; τż = C<sup>⊤</sup>x − Dz.
-        </div>
-        <p>Here <var>C</var> contains nonnegative cross-boundary conductances, <var>L</var><sub>in</sub> is the Laplacian of the retained edges, and</p>
-        <div class="equation">A = L<sub>in</sub> + diag(C1), &nbsp;&nbsp; D = L<sub>out</sub> + diag(C<sup>⊤</sup>1).</div>
-        <p>Assume each exterior component touches the retained network so that <var>D</var> is invertible. We can now make three very different modeling choices.</p>
+        <p>Consider linear diffusion on a finite undirected conductance network. Partition the full state into retained states \(\mathbf{x}\) and exterior states \(\mathbf{z}\). With unit interior storage capacity and a positive exterior capacity \(\tau\), write</p>
+        <div class="math-display">\[\begin{aligned}\dot{\mathbf{x}}&=-\mathbf{A}\mathbf{x}+\mathbf{C}\mathbf{z},\\[2pt]\tau\dot{\mathbf{z}}&=\mathbf{C}^{\mathsf T}\mathbf{x}-\mathbf{D}\mathbf{z},\end{aligned}\]</div>
+        <p>Notation throughout: bold lowercase letters denote vectors, bold uppercase letters denote matrices, italic letters denote scalars, and \(\mathcal B\) is a matrix-valued correction. Here \(\mathbf{C}\) contains nonnegative cross-boundary conductances, \(\mathbf{L}_{\mathrm{in}}\) is the Laplacian of the retained edges, and</p>
+        <div class="math-display">\[\begin{aligned}\mathbf{A}&=\mathbf{L}_{\mathrm{in}}+\operatorname{diag}(\mathbf{C}\mathbf{1}),\\[2pt]\mathbf{D}&=\mathbf{L}_{\mathrm{out}}+\operatorname{diag}(\mathbf{C}^{\mathsf T}\mathbf{1}),\end{aligned}\]</div>
+        <p>Assume each exterior component touches the retained network so that \(\mathbf{D}\) is invertible. We can now make three very different modeling choices.</p>
         <div class="comparison-grid">
-          <div><h3>Delete the crossing edges</h3><div class="equation">ẋ = −L<sub>in</sub>x</div><p>The cut has no flow across it. In this diffusion model, we have imposed an insulating boundary.</p></div>
-          <div><h3>Clamp the exterior</h3><div class="equation">ẋ = −Ax + Cg(t)</div><p>We keep the cross-boundary conductances but prescribe an exterior state z = g(t). Even g = 0 does not mean no flow.</p></div>
-          <div><h3>Eliminate a static exterior</h3><div class="equation">ẋ = −L<sub>K</sub>x</div><p>The exterior is assumed to equilibrate instantaneously, giving the Schur-complement operator below.</p></div>
+          <div><h3>Delete the crossing edges</h3><div class="math-display">\[\dot{\mathbf{x}}=-\mathbf{L}_{\mathrm{in}}\mathbf{x}\]</div><p>The cut has no flow across it. In this diffusion model, we have imposed an insulating boundary.</p></div>
+          <div><h3>Clamp the exterior</h3><div class="math-display">\[\dot{\mathbf{x}}=-\mathbf{A}\mathbf{x}+\mathbf{C}\mathbf{g}(t)\]</div><p>We keep the cross-boundary conductances but prescribe an exterior state z = g(t). Even g = 0 does not mean no flow.</p></div>
+          <div><h3>Eliminate a static exterior</h3><div class="math-display">\[\dot{\mathbf{x}}=-\mathbf{L}_{\mathrm{K}}\mathbf{x}\]</div><p>The exterior is assumed to equilibrate instantaneously, giving the Schur-complement operator below.</p></div>
         </div>
-        <div class="equation" role="math" aria-label="Kron reduced Laplacian equals A minus C D inverse C transpose">
-          L<sub>K</sub> = A − CD<sup>−1</sup>C<sup>⊤</sup>.
-        </div>
+        <div class="math-display">\[\mathbf{L}_{\mathrm{K}}=\mathbf{A}-\mathbf{C}\mathbf{D}^{-1}\mathbf{C}^{\mathsf T}\]</div>
         <p>This is the structure of <a href="https://motion.me.ucsb.edu/pdf/2011d-db.pdf" target="_blank" rel="noopener noreferrer">Kron reduction</a>. It can introduce effective couplings between retained vertices that were not adjacent in the induced subgraph. It preserves a specified static terminal behavior; it does not generally preserve the transients of an exterior with finite storage.</p>
         <blockquote><strong>Restricting a graph is not the same operation as reducing a physical system.</strong></blockquote>
         <p>Indeed, whenever positive-conductance crossing edges exist, the Laplacian of the induced subgraph differs from the principal block of the full Laplacian: the latter retains the diagonal contributions of the missing edges. This is a statement about this physical diffusion operator, not about every arbitrary GNN layer.</p>
@@ -119,17 +125,12 @@
 
       <section aria-labelledby="dynamic-exterior">
         <h2 id="dynamic-exterior">3. When the exterior has dynamics, it can leave memory</h2>
-        <p>For finite τ, the exterior has its own state and does not equilibrate instantaneously. Solving its differential equation and substituting into the retained system gives an <em>exact</em> reduction:</p>
-        <div class="equation equation-wide" role="math" aria-label="x dot at t equals minus A x plus eta plus integral from zero to t of memory kernel times x">
-          ẋ(t) = −Ax(t) + η<sub>τ</sub>(t) + ∫<sub>0</sub><sup>t</sup>K<sub>τ</sub>(t−s)x(s) ds,
-        </div>
-        <div class="equation equation-wide">
-          η<sub>τ</sub>(t) = Ce<sup>−Dt/τ</sup>z<sub>0</sub>, &nbsp;
-          K<sub>τ</sub>(t) = (1/τ)Ce<sup>−Dt/τ</sup>C<sup>⊤</sup>.
-        </div>
+        <p>For finite \(\tau\), the exterior has its own state and does not equilibrate instantaneously. Solving its differential equation and substituting into the retained system gives an <em>exact</em> reduction:</p>
+        <div class="math-display">\[\dot{\mathbf{x}}(t)=-\mathbf{A}\mathbf{x}(t)+\boldsymbol{\eta}_{\tau}(t)+\int_0^t\mathbf{K}_{\tau}(t-s)\mathbf{x}(s)\,\mathrm ds\]</div>
+        <div class="math-display">\[\begin{aligned}\boldsymbol{\eta}_{\tau}(t)&=\mathbf{C}e^{-\mathbf{D}t/\tau}\mathbf{z}_0,\\[2pt]\mathbf{K}_{\tau}(t)&=\frac1\tau\mathbf{C}e^{-\mathbf{D}t/\tau}\mathbf{C}^{\mathsf T},\end{aligned}\]</div>
         <p>The exterior contributes both its initial condition and a response to the retained system’s history. Different boundary sites can become coupled through pathways that lie entirely outside the retained graph. This is direct elimination of an omitted <em>graph subsystem</em>, not a question of spatial discretization.</p>
-        <p>In the frequency domain (for zero exterior initial state), the same effect becomes an operator acting on boundary variables:</p>
-        <div class="equation equation-wide">Y<sub>∂</sub>(s) = diag(C1) − C(τsI + D)<sup>−1</sup>C<sup>⊤</sup>.</div>
+        <p>In the Laplace domain (for zero exterior initial state), the same effect becomes an operator acting on boundary variables:</p>
+        <div class="math-display">\[\mathbf{Y}_{\partial}(s)=\operatorname{diag}(\mathbf{C}\mathbf{1})-\mathbf{C}(\tau s\mathbf{I}+\mathbf{D})^{-1}\mathbf{C}^{\mathsf T}\]</div>
         <p>A fixed weighted edge may be enough to represent a static boundary relation. A frequency-dependent terminal response generally requires memory, auxiliary states, or an approximation. The <a href="https://doi.org/10.1073/pnas.97.7.2968" target="_blank" rel="noopener noreferrer">Mori–Zwanzig / optimal-prediction literature</a> provides a broader context for why eliminating dynamical degrees of freedom can lead to memory terms.</p>
         <p><strong>Critically, an environment is not always a prerecorded input.</strong> When it responds to the subsystem, reusing a measured boundary signal from another trajectory after changing the interior need not preserve the original coupled physics.</p>
       </section>
@@ -137,13 +138,13 @@
       <section aria-labelledby="circuit-ports">
         <h2 id="circuit-ports">4. A direct graph-learning precedent: circuit boundary ports</h2>
         <p>A recent example makes this issue concrete. <a href="https://doi.org/10.1587/nolta.17.1146" target="_blank" rel="noopener noreferrer">Suzuki and Hisakado (2026)</a> construct boundary-aware graph representations and spectral GNNs for electrical circuits. Their external port terminations change the physical graph operator even when the internal vertices and edges remain unchanged.</p>
-        <div class="equation">L<sub>b</sub>(ω) = L<sub>G</sub> + ℬ(ω).</div>
-        <p>In their setup, ℬ(ω) represents frequency-dependent port admittances. The spectral basis built from <var>L</var><sub>b</sub> can therefore differ from that of the ordinary Laplacian <var>L</var><sub>G</sub>. Their experiments concern synthetic circuits and fault-current/source estimation; they do <strong>not</strong> demonstrate a general solution for unobserved future forcing or arbitrary graph dynamics.</p>
-        <p>A general linear network reveals why effective operators and effective excitations should be distinguished. Partition a frequency-domain network equation into retained and exterior variables:</p>
-        <div class="equation equation-wide">[Y<sub>II</sub> &nbsp; Y<sub>IE</sub>; &nbsp; Y<sub>EI</sub> &nbsp; Y<sub>EE</sub>] [x; z] = [J<sub>I</sub>; J<sub>E</sub>].</div>
-        <p>When <var>Y</var><sub>EE</sub> is invertible, eliminating the exterior yields</p>
-        <div class="equation equation-wide">Y<sub>eff</sub> = Y<sub>II</sub> − Y<sub>IE</sub>Y<sub>EE</sub><sup>−1</sup>Y<sub>EI</sub>,</div>
-        <div class="equation equation-wide">J<sub>eff</sub> = J<sub>I</sub> − Y<sub>IE</sub>Y<sub>EE</sub><sup>−1</sup>J<sub>E</sub>.</div>
+        <div class="math-display">\[\mathbf{L}_{b}(\omega)=\mathbf{L}_{G}+\mathcal{B}(\omega)\]</div>
+        <p>In their setup, the matrix-valued correction \(\mathcal{B}(\omega)\) represents frequency-dependent port admittances. The spectral basis built from \(\mathbf{L}_{b}\) can therefore differ from that of the ordinary Laplacian \(\mathbf{L}_{G}\). Their experiments concern synthetic circuits and fault-current/source estimation; they do <strong>not</strong> demonstrate a general solution for unobserved future forcing or arbitrary graph dynamics.</p>
+        <p>A general linear network reveals why effective operators and effective excitations should be distinguished. Partition a frequency-domain network equation into retained and exterior variables (all quantities are frequency-dependent):</p>
+        <div class="math-display">\[\begin{bmatrix}\mathbf{Y}_{II}&\mathbf{Y}_{IE}\\\mathbf{Y}_{EI}&\mathbf{Y}_{EE}\end{bmatrix}\begin{bmatrix}\mathbf{x}\\\mathbf{z}\end{bmatrix}=\begin{bmatrix}\mathbf{j}_{I}\\\mathbf{j}_{E}\end{bmatrix}\]</div>
+        <p>When \(\mathbf{Y}_{EE}\) is invertible, eliminating the exterior yields</p>
+        <div class="math-display">\[\mathbf{Y}_{\mathrm{eff}}=\mathbf{Y}_{II}-\mathbf{Y}_{IE}\mathbf{Y}_{EE}^{-1}\mathbf{Y}_{EI}\]</div>
+        <div class="math-display">\[\mathbf{j}_{\mathrm{eff}}=\mathbf{j}_{I}-\mathbf{Y}_{IE}\mathbf{Y}_{EE}^{-1}\mathbf{j}_{E}\]</div>
         <p><strong>The first expression changes the effective internal operator; the second changes the effective driving term.</strong> Known terminal admittance does not imply that the particular external excitation is known. An exterior that couples multiple ports can also induce nonlocal off-diagonal terminal responses, whereas independent port terminations may give a diagonal correction.</p>
         <p>This prior work matters for framing: boundary-aware graph learning already exists. The open question here is not whether GNNs can <em>ever</em> accept ports; it is how graph representations, physical boundary models and actually observed boundary information should be distinguished.</p>
       </section>
@@ -151,8 +152,8 @@
       <section aria-labelledby="ports">
         <h2 id="ports">5. What mathematical physics contributes: explicit interfaces</h2>
         <p>The theory of <a href="https://doi.org/10.1137/110840091" target="_blank" rel="noopener noreferrer">port-Hamiltonian systems on graphs</a> distinguishes internal connections from boundary flow/effort pairs. The boundary vertices remain part of the mathematical graph; the external interaction variables carry their own physical meaning.</p>
-        <p>For a storage system with state <var>x</var>, stored energy <var>H</var>(<var>x</var>) and appropriately paired port variables (<var>u</var>, <var>y</var>), a common passive-system balance is</p>
-        <div class="equation">dH/dt = −𝒟(x) + y<sup>⊤</sup>u, &nbsp;&nbsp; 𝒟(x) ≥ 0.</div>
+        <p>For a storage system with state \(\mathbf{x}\), stored energy \(H(\mathbf{x})\) and appropriately paired port variables \((\mathbf{u},\mathbf{y})\), a common passive-system balance is</p>
+        <div class="math-display">\[\frac{\mathrm dH}{\mathrm dt}=-\mathcal{D}(\mathbf{x})+\mathbf{y}^{\mathsf T}\mathbf{u},\qquad\mathcal{D}(\mathbf{x})\ge0\]</div>
         <p>The final term is power crossing the modeled boundary. It is <strong>not</strong> Shannon information and should not be treated as an arbitrary neural message. The lesson is structural: <em>one can model an interaction with the exterior without unfolding the entire exterior network</em>.</p>
         <p>Ports also require a termination law. An imposed source, a passive load, and another dynamical system can connect to the same interface but produce different dynamics. A low-dimensional port does not mean the unmodeled environment has only a low-dimensional internal state.</p>
         <p>This is consistent with compositional approaches to networks; for example, <a href="https://proceedings.mlr.press/v211/neary23a.html" target="_blank" rel="noopener noreferrer">Neary and Topcu (2023)</a> already explore compositional learning with port-Hamiltonian neural networks. We should not present subsystem learning or port-based modeling as uncharted territory.</p>
@@ -160,10 +161,10 @@
 
       <section aria-labelledby="explore">
         <h2 id="explore">6. One retained graph, four models of the outside world</h2>
-        <p>Take two retained reservoirs linked by a conductance of 1/4. Each also connects by conductance one to a shared exterior reservoir of storage capacity τ. Start from retained states (2, 0) and exterior state 0. The exterior-capacity slider below changes the <em>physical system</em>, while all four curves retain the same two-node graph.</p>
+        <p>Take two retained reservoirs linked by a conductance of 1/4. Each also connects by conductance one to a shared exterior reservoir of storage capacity τ. Start from retained state \(\mathbf{x}(0)=(2,0)^{\mathsf T}\) and exterior state \(z(0)=0\). The exterior-capacity slider below changes the <em>physical system</em>, while all four curves retain the same two-node graph.</p>
         <figure class="experiment boundary-explorer">
           <div class="controls">
-            <label for="tau">Exterior storage capacity τ <output id="tau-value" for="tau">1.00</output><input id="tau" type="range" min="0.02" max="3" step="0.02" value="1"></label>
+            <label for="tau">Exterior storage capacity \(\tau\) <output id="tau-value" for="tau">1.00</output><input id="tau" type="range" min="0.02" max="3" step="0.02" value="1"></label>
             <div class="control-explanation">Change how quickly the omitted environment responds.</div>
           </div>
           <ul class="legend" aria-label="Boundary model legend">
@@ -175,9 +176,9 @@
           <figcaption>Exact analytic curves from the stated linear dynamical system. This is a comparison of boundary assumptions, not a neural-network benchmark.</figcaption>
         </figure>
         <p>For the full system the first retained state has a closed form:</p>
-        <div class="equation equation-wide">x<sub>1</sub>(t) = 2/(2+τ) + [τ/(2+τ)] e<sup>−(1+2/τ)t</sup> + e<sup>−3t/2</sup>.</div>
-        <p>As τ tends to zero, the static reduction becomes accurate in this example. Its exact state error in either retained coordinate is</p>
-        <div class="equation equation-wide">δ<sub>τ</sub>(t) = [τ/(2+τ)] (1 − e<sup>−(1+2/τ)t</sup>).</div>
+        <div class="math-display">\[x_1(t)=\frac{2}{2+\tau}+\frac{\tau}{2+\tau}e^{-(1+2/\tau)t}+e^{-3t/2}\]</div>
+        <p>As \(\tau\) tends to zero, the static reduction becomes accurate in this example. The magnitude of its exact state error in either retained coordinate is</p>
+        <div class="math-display">\[\delta_{\tau}(t)=\frac{\tau}{2+\tau}\left(1-e^{-(1+2/\tau)t}\right)\]</div>
         <p>The practical lesson is not “always add memory.” It is: <strong>choose the simplest exterior model that preserves the behavior needed for the task.</strong></p>
 
         <h3>Separate question: what if the boundary forcing is unobserved?</h3>
