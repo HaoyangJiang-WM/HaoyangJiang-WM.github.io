@@ -76,4 +76,5 @@ function draw() {
 forcing.addEventListener("input", draw);
 gauge.addEventListener("change", draw);
 new ResizeObserver(draw).observe(canvas);
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(draw).catch(() => {});
 draw();
