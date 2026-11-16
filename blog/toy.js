@@ -45,7 +45,7 @@ function draw() {
   const x = (step) => left + (right - left) * step / steps;
   const y = (value) => bottom - (bottom - top) * value / 2;
 
-  ctx.font = "12px sans-serif";
+  ctx.font = '12px "Source Sans 3", "Segoe UI", sans-serif';
   ctx.fillStyle = "#545c57";
   ctx.fillText("Gauge signal", 4, 15);
   ctx.textAlign = "right";
