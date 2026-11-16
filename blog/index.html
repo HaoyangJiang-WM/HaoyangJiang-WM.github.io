@@ -3,11 +3,50 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="A toy river graph shows how hidden boundary forcing can produce two futures from identical observations." />
+  <meta name="description" content="Why restricting a graph is not the same as reducing an open physical system: boundary ports, Kron reduction, memory, and graph learning." />
   <link rel="canonical" href="https://haoyangjiang-wm.github.io/blog/" />
   <link rel="stylesheet" href="/src/index.css" />
   <link rel="stylesheet" href="./blog.css" />
-  <title>Are Graph Neural Networks Bound by Their Nodes? | Haoyang Jiang</title>
+  <title>A Graph Is Not a Closed System | Haoyang Jiang</title>
+<style>
+.blog-page { max-width: 54rem; }
+.blog-page p { line-height: 1.76; }
+.blog-page section { margin-top: 3.1rem; }
+.blog-page h2 { scroll-margin-top: 1.5rem; }
+.blog-page h3 { margin-top: 1.45rem; }
+.eyebrow { color: var(--muted); font-size: .78rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; }
+.article-toc { display: grid; gap: .27rem; padding: 1.1rem 1.25rem; border: 1px solid var(--line); margin: 2rem 0 2.8rem; background: color-mix(in srgb, var(--surface, #fff) 95%, #7f91a4); }
+.article-toc strong { margin-bottom: .35rem; }
+.article-toc a { font-size: .93rem; }
+.equation { padding: .65rem .35rem; overflow-x: auto; white-space: nowrap; font-family: "Cambria Math", "STIX Two Math", Georgia, serif; font-size: 1.17rem; }
+.equation-wide { font-size: 1.01rem; }
+.comparison-grid { display: grid; gap: .65rem; grid-template-columns: repeat(3,minmax(0,1fr)); margin: 1.5rem 0; }
+.comparison-grid > div { border: 1px solid var(--line); padding: 1rem .8rem; }
+.comparison-grid h3 { font-size: 1.04rem; margin-top: 0; }
+.comparison-grid .equation { font-size: .93rem; white-space: normal; }
+.comparison-grid p { font-size: .91rem; line-height: 1.55; }
+.blog-table { width: 100%; border-collapse: collapse; font-size: .94rem; margin: 1.4rem 0; }
+.blog-table th, .blog-table td { text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); padding: .7rem .55rem; }
+.blog-table th { font-weight: 700; }
+.references { padding-left: 1.35rem; }
+.references li { padding-left: .25rem; margin: .5rem 0; line-height: 1.5; font-size: .92rem; }
+.method-note { font-size: .9rem; color: var(--muted); border-top: 1px solid var(--line); padding-top: 1rem; }
+#closures { display: block; width: 100%; height: 300px; }
+.boundary-explorer .control-explanation { align-self: center; color: var(--muted); font-size: .9rem; }
+.boundary-explorer .legend .full-line { color: #174c83; }
+.boundary-explorer .legend .deleted-line { color: #cb710c; }
+.boundary-explorer .legend .clamped-line { color: #438963; }
+.boundary-explorer .legend .kron-line { color: #a34456; }
+.boundary-explorer .legend .clamped-line::before { border-top-style: dashed; }
+.boundary-explorer .legend .kron-line::before { border-top-style: dotted; }
+#closure-readout { font-size: .94rem; font-weight: 650; }
+@media(max-width:650px) {
+  .comparison-grid { grid-template-columns: 1fr; }
+  .boundary-explorer .controls { grid-template-columns: 1fr; }
+  #closures { height: 240px; }
+  .equation { font-size: .98rem; }
+}
+</style>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -20,31 +59,129 @@
     </div>
   </header>
   <main id="main" class="container blog-page" tabindex="-1">
+    
     <article>
       <header class="article-header">
-        <h1>Are Graph Neural Networks Bound by Their Nodes?</h1>
-        <p class="deck">How the same observed river network can have two different futures.</p>
-        <p class="byline"><a href="/">Haoyang Jiang</a> · William &amp; Mary · <time datetime="2026-11-14">November 14, 2026</time></p>
+        <p class="eyebrow">Graph Representation · Mathematical Physics · Open Systems</p>
+        <h1>A Graph Is Not a Closed System</h1>
+        <p class="deck">What remains when the environment is left outside the graph?</p>
+        <p class="byline"><a href="/">Haoyang Jiang</a> · William &amp; Mary · Published <time datetime="2026-11-14">November 14, 2026</time> · Updated <time datetime="2026-11-16">November 16, 2026</time></p>
       </header>
 
-      <p>Imagine two stretches of river with identical readings at every gauge. Upstream of the first stretch, a gate opens. Upstream of the second, it stays shut. At the moment we make a forecast, the observed graphs look identical. What should a graph neural network predict?</p>
+      <p>Imagine modeling two connected reservoirs. We retain their water levels and the pipe between them, draw two vertices and one edge, and call the result our graph. Yet both reservoirs also exchange water with a third reservoir outside the region we chose to represent.</p>
+      <p>We can remove that exterior reservoir from the <em>representation</em>. We cannot make its physical effects disappear by deleting its vertex. The deeper question is not simply whether we have missed an external input. It is this: <strong>what replaces an environment when its internal states are no longer represented?</strong> A prescribed signal? A fixed boundary condition? An effective connection? An evolving response that remembers the past?</p>
+      <blockquote>Choosing the nodes of a graph chooses what we represent. It does not, by itself, choose a physically valid model of everything we leave out.</blockquote>
+      <p>This post examines that distinction through graph reduction, boundary ports and one small reproducible dynamical system. It is a synthesis of existing mathematics, not a claim that graph neural networks are intrinsically incapable of accepting external information.</p>
 
-      <section aria-labelledby="information">
-        <h2 id="information">Where does information come from?</h2>
-        <p>In a message-passing GNN, each node updates its representation using messages from its neighbors. Stacking layers lets information from farther away reach a node. Every message still traces back to inputs the model received, such as node measurements, edge attributes, or a forcing variable supplied separately.</p>
-        <p>Suppose a deterministic predictor receives just the observed graph <var>G</var> and its current state <var>X</var><sub><var>t</var></sub>. Its forecast is</p>
-        <div class="equation">X̂<sub>t+1</sub> = F<sub>θ</sub>(X<sub>t</sub>, G).</div>
-        <p>For fixed parameters, identical inputs yield the same forecast. More layers can move available information farther along the graph. The upstream gate setting is absent from those inputs.</p>
+      <nav class="article-toc" aria-label="On this page">
+        <strong>Contents</strong>
+        <a href="#what-a-graph-cuts">1. What a graph leaves out</a>
+        <a href="#three-cuts">2. Delete, clamp, or eliminate?</a>
+        <a href="#dynamic-exterior">3. When the exterior has dynamics</a>
+        <a href="#circuit-ports">4. A circuit example: boundary-aware Laplacians</a>
+        <a href="#ports">5. What physical ports contribute</a>
+        <a href="#explore">6. Interactive experiment</a>
+        <a href="#learning">7. What can a learner actually know?</a>
+        <a href="#evaluation">8. What should we test?</a>
+        <a href="#references">References</a>
+      </nav>
+
+      <section aria-labelledby="what-a-graph-cuts">
+        <h2 id="what-a-graph-cuts">1. What a graph leaves out</h2>
+        <p>A graph <var>G</var> = (<var>V</var>, <var>E</var>) specifies which entities and relations we retain. A graph predictor may receive these relations, the observed state <var>X</var>, and perhaps a history of such states. For fixed parameters, a deterministic predictor necessarily gives the same output for the same inputs.</p>
+        <div class="equation" role="math" aria-label="Forecast X hat at time t plus h equals F theta of graph G and observed history">X̂<sub>t+h</sub> = F<sub>θ</sub>(G, X<sub>t−k:t</sub>).</div>
+        <p>But drawing a finite graph is not the same as declaring that it is dynamically closed. If the retained vertices are a subset <var>V</var> of a larger physical network, interactions crossing from the omitted exterior <var>W</var> into <var>V</var> still exist. The induced subgraph does not, by itself, tell us what happens at that cut.</p>
+        <p><strong>Where does information come from?</strong> The modeled state may be affected by internal interactions, observed boundary inputs, and unobserved exterior processes. These are different sources of physical influence. Their distinction is easy to lose when all data are packed into a single node-feature tensor.</p>
+        <p>Nodes are not the problem: a neural network can attach a boundary measurement to an existing node, use global features, or employ an auxiliary state. The problem is whether the relevant boundary mechanism—and the information available at prediction time—has been specified.</p>
       </section>
 
-      <section aria-labelledby="open">
-        <h2 id="open">What happens when the graph is open?</h2>
-        <p>The observed graph ends at the first gauge, but the river continues upstream. An external input <var>B</var><sub><var>t</var></sub> can cross that boundary and change the observed state. The physical update now depends on <var>X</var><sub><var>t</var></sub>, <var>G</var>, and <var>B</var><sub><var>t</var></sub>.</p>
-        <div class="equation">X<sub>t+1</sub> = Φ(X<sub>t</sub>, G, B<sub>t</sub>).</div>
-        <blockquote>A graph defines which nodes can exchange information, but it does not necessarily define where the information governing their dynamics originates.</blockquote>
-        <h3>A three-gauge toy experiment</h3>
-        <p>All three gauges start at zero in both scenarios. At every step, each gauge keeps half its current signal and takes half from its upstream neighbor. The first gauge takes that upstream value from the boundary, which is held at zero in one scenario and at the slider value in the other.</p>
-        <div class="equation">x<sub>i</sub>(t+1) = ½ x<sub>i</sub>(t) + ½ x<sub>i−1</sub>(t), &nbsp; x<sub>0</sub>(t) = B.</div>
+      <section aria-labelledby="three-cuts">
+        <h2 id="three-cuts">2. Three ways to cut the same physical network</h2>
+        <p>Consider linear diffusion on a finite undirected conductance network. Partition the full state into retained states <var>x</var> and exterior states <var>z</var>. With unit interior storage capacity and a positive exterior capacity τ, write</p>
+        <div class="equation" role="math" aria-label="x dot equals minus A x plus C z; tau z dot equals C transpose x minus D z">
+          ẋ = −Ax + Cz, &nbsp;&nbsp; τż = C<sup>⊤</sup>x − Dz.
+        </div>
+        <p>Here <var>C</var> contains nonnegative cross-boundary conductances, <var>L</var><sub>in</sub> is the Laplacian of the retained edges, and</p>
+        <div class="equation">A = L<sub>in</sub> + diag(C1), &nbsp;&nbsp; D = L<sub>out</sub> + diag(C<sup>⊤</sup>1).</div>
+        <p>Assume each exterior component touches the retained network so that <var>D</var> is invertible. We can now make three very different modeling choices.</p>
+        <div class="comparison-grid">
+          <div><h3>Delete the crossing edges</h3><div class="equation">ẋ = −L<sub>in</sub>x</div><p>The cut has no flow across it. In this diffusion model, we have imposed an insulating boundary.</p></div>
+          <div><h3>Clamp the exterior</h3><div class="equation">ẋ = −Ax + Cg(t)</div><p>We keep the cross-boundary conductances but prescribe an exterior state z = g(t). Even g = 0 does not mean no flow.</p></div>
+          <div><h3>Eliminate a static exterior</h3><div class="equation">ẋ = −L<sub>K</sub>x</div><p>The exterior is assumed to equilibrate instantaneously, giving the Schur-complement operator below.</p></div>
+        </div>
+        <div class="equation" role="math" aria-label="Kron reduced Laplacian equals A minus C D inverse C transpose">
+          L<sub>K</sub> = A − CD<sup>−1</sup>C<sup>⊤</sup>.
+        </div>
+        <p>This is the structure of <a href="https://motion.me.ucsb.edu/pdf/2011d-db.pdf" target="_blank" rel="noopener noreferrer">Kron reduction</a>. It can introduce effective couplings between retained vertices that were not adjacent in the induced subgraph. It preserves a specified static terminal behavior; it does not generally preserve the transients of an exterior with finite storage.</p>
+        <blockquote><strong>Restricting a graph is not the same operation as reducing a physical system.</strong></blockquote>
+        <p>Indeed, whenever positive-conductance crossing edges exist, the Laplacian of the induced subgraph differs from the principal block of the full Laplacian: the latter retains the diagonal contributions of the missing edges. This is a statement about this physical diffusion operator, not about every arbitrary GNN layer.</p>
+      </section>
+
+      <section aria-labelledby="dynamic-exterior">
+        <h2 id="dynamic-exterior">3. When the exterior has dynamics, it can leave memory</h2>
+        <p>For finite τ, the exterior has its own state and does not equilibrate instantaneously. Solving its differential equation and substituting into the retained system gives an <em>exact</em> reduction:</p>
+        <div class="equation equation-wide" role="math" aria-label="x dot at t equals minus A x plus eta plus integral from zero to t of memory kernel times x">
+          ẋ(t) = −Ax(t) + η<sub>τ</sub>(t) + ∫<sub>0</sub><sup>t</sup>K<sub>τ</sub>(t−s)x(s) ds,
+        </div>
+        <div class="equation equation-wide">
+          η<sub>τ</sub>(t) = Ce<sup>−Dt/τ</sup>z<sub>0</sub>, &nbsp;
+          K<sub>τ</sub>(t) = (1/τ)Ce<sup>−Dt/τ</sup>C<sup>⊤</sup>.
+        </div>
+        <p>The exterior contributes both its initial condition and a response to the retained system’s history. Different boundary sites can become coupled through pathways that lie entirely outside the retained graph. This is direct elimination of an omitted <em>graph subsystem</em>, not a question of spatial discretization.</p>
+        <p>In the frequency domain (for zero exterior initial state), the same effect becomes an operator acting on boundary variables:</p>
+        <div class="equation equation-wide">Y<sub>∂</sub>(s) = diag(C1) − C(τsI + D)<sup>−1</sup>C<sup>⊤</sup>.</div>
+        <p>A fixed weighted edge may be enough to represent a static boundary relation. A frequency-dependent terminal response generally requires memory, auxiliary states, or an approximation. The <a href="https://doi.org/10.1073/pnas.97.7.2968" target="_blank" rel="noopener noreferrer">Mori–Zwanzig / optimal-prediction literature</a> provides a broader context for why eliminating dynamical degrees of freedom can lead to memory terms.</p>
+        <p><strong>Critically, an environment is not always a prerecorded input.</strong> When it responds to the subsystem, reusing a measured boundary signal from another trajectory after changing the interior need not preserve the original coupled physics.</p>
+      </section>
+
+      <section aria-labelledby="circuit-ports">
+        <h2 id="circuit-ports">4. A direct graph-learning precedent: circuit boundary ports</h2>
+        <p>A recent example makes this issue concrete. <a href="https://doi.org/10.1587/nolta.17.1146" target="_blank" rel="noopener noreferrer">Suzuki and Hisakado (2026)</a> construct boundary-aware graph representations and spectral GNNs for electrical circuits. Their external port terminations change the physical graph operator even when the internal vertices and edges remain unchanged.</p>
+        <div class="equation">L<sub>b</sub>(ω) = L<sub>G</sub> + ℬ(ω).</div>
+        <p>In their setup, ℬ(ω) represents frequency-dependent port admittances. The spectral basis built from <var>L</var><sub>b</sub> can therefore differ from that of the ordinary Laplacian <var>L</var><sub>G</sub>. Their experiments concern synthetic circuits and fault-current/source estimation; they do <strong>not</strong> demonstrate a general solution for unobserved future forcing or arbitrary graph dynamics.</p>
+        <p>A general linear network reveals why effective operators and effective excitations should be distinguished. Partition a frequency-domain network equation into retained and exterior variables:</p>
+        <div class="equation equation-wide">[Y<sub>II</sub> &nbsp; Y<sub>IE</sub>; &nbsp; Y<sub>EI</sub> &nbsp; Y<sub>EE</sub>] [x; z] = [J<sub>I</sub>; J<sub>E</sub>].</div>
+        <p>When <var>Y</var><sub>EE</sub> is invertible, eliminating the exterior yields</p>
+        <div class="equation equation-wide">Y<sub>eff</sub> = Y<sub>II</sub> − Y<sub>IE</sub>Y<sub>EE</sub><sup>−1</sup>Y<sub>EI</sub>,</div>
+        <div class="equation equation-wide">J<sub>eff</sub> = J<sub>I</sub> − Y<sub>IE</sub>Y<sub>EE</sub><sup>−1</sup>J<sub>E</sub>.</div>
+        <p><strong>The first expression changes the effective internal operator; the second changes the effective driving term.</strong> Known terminal admittance does not imply that the particular external excitation is known. An exterior that couples multiple ports can also induce nonlocal off-diagonal terminal responses, whereas independent port terminations may give a diagonal correction.</p>
+        <p>This prior work matters for framing: boundary-aware graph learning already exists. The open question here is not whether GNNs can <em>ever</em> accept ports; it is how graph representations, physical boundary models and actually observed boundary information should be distinguished.</p>
+      </section>
+
+      <section aria-labelledby="ports">
+        <h2 id="ports">5. What mathematical physics contributes: explicit interfaces</h2>
+        <p>The theory of <a href="https://doi.org/10.1137/110840091" target="_blank" rel="noopener noreferrer">port-Hamiltonian systems on graphs</a> distinguishes internal connections from boundary flow/effort pairs. The boundary vertices remain part of the mathematical graph; the external interaction variables carry their own physical meaning.</p>
+        <p>For a storage system with state <var>x</var>, stored energy <var>H</var>(<var>x</var>) and appropriately paired port variables (<var>u</var>, <var>y</var>), a common passive-system balance is</p>
+        <div class="equation">dH/dt = −𝒟(x) + y<sup>⊤</sup>u, &nbsp;&nbsp; 𝒟(x) ≥ 0.</div>
+        <p>The final term is power crossing the modeled boundary. It is <strong>not</strong> Shannon information and should not be treated as an arbitrary neural message. The lesson is structural: <em>one can model an interaction with the exterior without unfolding the entire exterior network</em>.</p>
+        <p>Ports also require a termination law. An imposed source, a passive load, and another dynamical system can connect to the same interface but produce different dynamics. A low-dimensional port does not mean the unmodeled environment has only a low-dimensional internal state.</p>
+        <p>This is consistent with compositional approaches to networks; for example, <a href="https://proceedings.mlr.press/v211/neary23a.html" target="_blank" rel="noopener noreferrer">Neary and Topcu (2023)</a> already explore compositional learning with port-Hamiltonian neural networks. We should not present subsystem learning or port-based modeling as uncharted territory.</p>
+      </section>
+
+      <section aria-labelledby="explore">
+        <h2 id="explore">6. One retained graph, four models of the outside world</h2>
+        <p>Take two retained reservoirs linked by a conductance of 1/4. Each also connects by conductance one to a shared exterior reservoir of storage capacity τ. Start from retained states (2, 0) and exterior state 0. The exterior-capacity slider below changes the <em>physical system</em>, while all four curves retain the same two-node graph.</p>
+        <figure class="experiment boundary-explorer">
+          <div class="controls">
+            <label for="tau">Exterior storage capacity τ <output id="tau-value" for="tau">1.00</output><input id="tau" type="range" min="0.02" max="3" step="0.02" value="1"></label>
+            <div class="control-explanation">Change how quickly the omitted environment responds.</div>
+          </div>
+          <ul class="legend" aria-label="Boundary model legend">
+            <li class="full-line">Full three-state physics</li><li class="deleted-line">Delete exterior edges</li>
+            <li class="clamped-line">Clamp exterior to zero</li><li class="kron-line">Static Kron reduction</li>
+          </ul>
+          <canvas id="closures" role="img" aria-label="Retained state x1 over time for four boundary models"></canvas>
+          <p id="closure-readout" aria-live="polite"></p>
+          <figcaption>Exact analytic curves from the stated linear dynamical system. This is a comparison of boundary assumptions, not a neural-network benchmark.</figcaption>
+        </figure>
+        <p>For the full system the first retained state has a closed form:</p>
+        <div class="equation equation-wide">x<sub>1</sub>(t) = 2/(2+τ) + [τ/(2+τ)] e<sup>−(1+2/τ)t</sup> + e<sup>−3t/2</sup>.</div>
+        <p>As τ tends to zero, the static reduction becomes accurate in this example. Its exact state error in either retained coordinate is</p>
+        <div class="equation equation-wide">δ<sub>τ</sub>(t) = [τ/(2+τ)] (1 − e<sup>−(1+2/τ)t</sup>).</div>
+        <p>The practical lesson is not “always add memory.” It is: <strong>choose the simplest exterior model that preserves the behavior needed for the task.</strong></p>
+
+        <h3>Separate question: what if the boundary forcing is unobserved?</h3>
+        <p>The earlier three-gauge demonstration is still useful, but it tests an <em>information limit</em>, not whether a particular boundary closure is correct. Two different forcing schedules can produce different futures from identical graph observations, while an input-blind point predictor must give the same forecast for both scenarios.</p>
         <figure class="experiment">
           <div class="river" role="img" aria-label="An unobserved upstream boundary feeds three observed gauges in order">
             <span class="boundary">Boundary</span><span aria-hidden="true">→</span><span>Gauge 1</span><span aria-hidden="true">→</span><span>Gauge 2</span><span aria-hidden="true">→</span><span>Gauge 3</span>
@@ -59,18 +196,105 @@
           <figcaption>The three curves are computed from the recurrence. The dashed curve is the optimal squared-error point forecast when the two boundary scenarios are equally likely and the input is hidden.</figcaption>
           <noscript><p>With high input set to 1, the first difference reaches gauges 1, 2, and 3 at steps 1, 2, and 3, respectively.</p></noscript>
         </figure>
-        <p>At gauge 2, the readings first diverge after two steps, the time it takes for the signal to cross two links. At any horizon where the two possible readings are <var>y</var><sub>0</sub> and <var>y</var><sub>1</sub>, a predictor given only the common initial state must return the same value for both scenarios. For equally likely scenarios, the midpoint minimizes expected squared error, and the minimum is ( <var>y</var><sub>1</sub> − <var>y</var><sub>0</sub> )² / 4. Even the best point forecast under that loss can miss both physical outcomes.</p>
+        <p>The midpoint curve is optimal only under the stated equal-probability, squared-error assumptions. A predictive distribution could correctly represent both futures. This does not prove a deficiency unique to GNNs.</p>
       </section>
 
-      <section aria-labelledby="discussion">
-        <h2 id="discussion">Discussion</h2>
-        <p>This ambiguity comes from the information available at forecast time. It applies to any predictor with the same inputs. Message passing makes the modeling choice especially visible because the graph is often the only path through which the physical state is represented. In the toy experiment, the boundary input is supplied by design to the simulator, while the forecast given only the initial graph sees neither scenario label.</p>
-        <p>When upstream measurements or control schedules are available, they can enter through an explicit boundary input. When earlier sensor readings contain clues about the forcing, a model can try to infer a latent boundary state from history. If two forcing scenarios remain indistinguishable even with that history, a predictive distribution can represent both futures and communicate the uncertainty.</p>
-        <p>For a hydrologic application, see <a href="https://arxiv.org/abs/2610.01765">Physics-Refined Spatiotemporal Forecasting on Open-Boundary Hydrologic Graphs</a>. That work uses learned boundary proxies and physics-guided refinement for long-horizon prediction.</p>
+      <section aria-labelledby="learning">
+        <h2 id="learning">7. What can a graph learner actually know?</h2>
+        <p>We should distinguish at least three situations: a known imposed boundary input, a partially observed input, and an interacting environment with unknown internal state. They are not the same learning problem.</p>
+        <table class="blog-table">
+          <thead><tr><th>Modeling question</th><th>What needs to be specified?</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Representation</strong></td><td>Which nodes, edges and external interfaces have been retained?</td></tr>
+            <tr><td><strong>Closure</strong></td><td>What relation replaces the omitted environment: prescribed input, static response, dynamic feedback or uncertainty?</td></tr>
+            <tr><td><strong>Observation</strong></td><td>What boundary measurements and future controls are available <em>when the prediction is made</em>?</td></tr>
+            <tr><td><strong>Identification</strong></td><td>Which response parameters or hidden states can actually be identified from those observations?</td></tr>
+          </tbody>
+        </table>
+        <p>Even perfect observations of the interface need not identify the exterior's entire topology. Different networks can have the same terminal behavior. The appropriate target may be a predictive <em>boundary response</em>, not reconstruction of every hidden node.</p>
+        <p>Likewise, if both internal dynamics and external driving are unconstrained, they may not be separately identifiable from one observed trajectory. Physical knowledge, external measurements and interventions can make the distinction testable.</p>
+        <p>When future forcing is not yet observable, a learned history encoder may estimate correlated latent factors but cannot know an independent intervention chosen after the forecast origin. A calibrated distribution may be more appropriate than a single point estimate.</p>
+      </section>
+
+      <section aria-labelledby="evaluation">
+        <h2 id="evaluation">8. What would count as progress in graph learning?</h2>
+        <p>The experiments above validate mathematical identities; they do not rank GNN architectures. A convincing learning comparison should hold available information constant while changing representation or inductive bias.</p>
+        <table class="blog-table">
+          <thead><tr><th>Question</th><th>Fair comparison</th></tr></thead>
+          <tbody>
+            <tr><td>Does more boundary evidence help?</td><td>Internal-only inputs versus the same inputs <em>plus</em> measured boundary information. Attribute gains to new information.</td></tr>
+            <tr><td>Does an explicit interface help?</td><td>Boundary-conditioned MPNN / recurrent baseline versus port-structured model, with identical observations and budgets.</td></tr>
+            <tr><td>Does learned dynamics survive repartitioning?</td><td>Model the <em>same physical network</em> under different subgraph cuts, preserving the appropriate cross-boundary coupling law.</td></tr>
+            <tr><td>When is a simple closure enough?</td><td>Compare imposed-input and static/Kron baselines against dynamic models over time-scale regimes where each is justified.</td></tr>
+          </tbody>
+        </table>
+        <p>A model can conserve the total quantity yet move it through the wrong interface. It can also satisfy a passivity constraint while predicting an incorrect trajectory. We should report prediction error, interface-law consistency, conservation or energy balance where applicable, and uncertainty calibration when external forcing is unknown.</p>
+        <p>Existing work already addresses important pieces: <a href="https://proceedings.neurips.cc/paper_files/paper/2022/hash/93476ae409ae3246e22a9d4b931f84ed-Abstract-Conference.html" target="_blank" rel="noopener noreferrer">Horie and Mitsume (2022)</a> study graph PDE solvers with mixed boundary conditions; <a href="https://proceedings.mlr.press/v211/neary23a.html" target="_blank" rel="noopener noreferrer">Neary and Topcu (2023)</a> study compositional port-Hamiltonian learning; and <a href="https://doi.org/10.1587/nolta.17.1146" target="_blank" rel="noopener noreferrer">Suzuki and Hisakado (2026)</a> construct a boundary-aware graph Laplacian and spectral GNN for circuits. These are precedents, not peripheral exceptions.</p>
+      </section>
+
+      <section aria-labelledby="ending">
+        <h2 id="ending">The boundary is a modeling decision</h2>
+        <p>A graph can describe a subsystem perfectly well. The mistake begins when the chosen vertex set is also treated as a complete account of that subsystem's environment.</p>
+        <p>Removing exterior vertices may leave a prescribed input, a static terminal relation, a dynamic response with memory, or uncertainty about unmeasured forces. The right description depends on the physics, observations and prediction task—not on the name of a neural architecture.</p>
+        <blockquote>When we draw the boundary of a graph, what model of the outside world have we silently chosen?</blockquote>
+      </section>
+
+      <section aria-labelledby="references">
+        <h2 id="references">Selected references</h2>
+        <ol class="references">
+          <li>van der Schaft &amp; Maschke (2013). <a href="https://doi.org/10.1137/110840091" target="_blank" rel="noopener noreferrer">Port-Hamiltonian Systems on Graphs</a>. <em>SIAM Journal on Control and Optimization</em>.</li>
+          <li>Dörfler &amp; Bullo (2013). <a href="https://doi.org/10.1109/TCSI.2012.2215780" target="_blank" rel="noopener noreferrer">Kron Reduction of Graphs With Applications to Electrical Networks</a>. <em>IEEE TCAS-I</em>.</li>
+          <li>Chorin, Hald &amp; Kupferman (2000). <a href="https://doi.org/10.1073/pnas.97.7.2968" target="_blank" rel="noopener noreferrer">Optimal prediction and the Mori–Zwanzig representation of irreversible processes</a>. <em>PNAS</em>.</li>
+          <li>Horie &amp; Mitsume (2022). <a href="https://proceedings.neurips.cc/paper_files/paper/2022/hash/93476ae409ae3246e22a9d4b931f84ed-Abstract-Conference.html" target="_blank" rel="noopener noreferrer">Physics-Embedded Neural Networks: Graph Neural PDE Solvers with Mixed Boundary Conditions</a>. <em>NeurIPS</em>.</li>
+          <li>Neary &amp; Topcu (2023). <a href="https://proceedings.mlr.press/v211/neary23a.html" target="_blank" rel="noopener noreferrer">Compositional Learning of Dynamical System Models Using Port-Hamiltonian Neural Networks</a>. <em>L4DC</em>.</li>
+          <li>Suzuki &amp; Hisakado (2026). <a href="https://doi.org/10.1587/nolta.17.1146" target="_blank" rel="noopener noreferrer">Graph neural networks with boundary conditions based on ports in electrical circuits</a>. <em>Nonlinear Theory and Its Applications, IEICE</em>.</li>
+        </ol>
+        <p class="method-note"><strong>Scope and provenance.</strong> The two-reservoir traces and the three-gauge interactive experiment follow specified toy equations; they are not experiments from the cited papers, and no neural network was trained here. The literature is used for context and interpretation, not to claim that the synthesis introduces a new theorem or a new standard field named “Open Graph Learning.”</p>
       </section>
     </article>
   </main>
   <footer class="site-footer"><div class="container footer-row"><a href="/">← Back to homepage</a><a href="#main">Back to top ↑</a></div></footer>
   <script type="module" src="./toy.js"></script>
+<script>
+(() => {
+ const slider=document.getElementById('tau');
+ const out=document.getElementById('tau-value');
+ const readout=document.getElementById('closure-readout');
+ const canvas=document.getElementById('closures');
+ if(!slider||!out||!readout||!canvas) return;
+ const ctx=canvas.getContext('2d');
+ const exp=Math.exp;
+ const models=[
+ {name:'Full physics',color:'#174c83',dash:[],fn:(t,a)=>2/(2+a)+a/(2+a)*exp(-(1+2/a)*t)+exp(-1.5*t)},
+ {name:'Delete crossing edges',color:'#cb710c',dash:[7,4],fn:t=>1+exp(-.5*t)},
+ {name:'Clamp exterior to zero',color:'#438963',dash:[8,3,2,3],fn:t=>exp(-t)+exp(-1.5*t)},
+ {name:'Static Kron',color:'#a34456',dash:[2,4],fn:t=>1+exp(-1.5*t)}
+ ];
+ function draw(){
+   const tau=Number(slider.value);
+   out.value=tau.toFixed(2);
+   const exactError=tau/(2+tau)*(1-exp(-(1+2/tau)*4));
+   readout.textContent='At t = 4, the static Kron closure differs from the full model by '+exactError.toFixed(4)+' in retained state x1. The approximation improves as the exterior becomes faster (smaller τ).';
+   canvas.setAttribute('aria-label', 'Retained node x1 against time zero through four. '+readout.textContent);
+   if(!ctx) return;
+   const box=canvas.getBoundingClientRect();const w=box.width,h=box.height;
+   if(!w||!h) return;
+   const dpr=Math.min(window.devicePixelRatio||1,3);
+   canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);
+   const left=46,right=w-15,top=25,bottom=h-38;
+   const xp=t=>left+(right-left)*t/4;
+   const yp=v=>bottom-(bottom-top)*v/2.1;
+   ctx.font='11px sans-serif';ctx.fillStyle='#59645f';ctx.textAlign='right';
+   for(const y of [0,.5,1,1.5,2]){ctx.strokeStyle='#e0e5e2';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(left,yp(y));ctx.lineTo(right,yp(y));ctx.stroke();ctx.fillText(String(y),left-7,yp(y)+4);}
+   ctx.textAlign='center';for(const t of [0,1,2,3,4])ctx.fillText(String(t),xp(t),bottom+17);
+   ctx.fillText('Time', (left+right)/2,h-8);ctx.textAlign='left';ctx.fillText('State x1',6,12);
+   for(const line of models){ctx.strokeStyle=line.color;ctx.lineWidth=2.45;ctx.setLineDash(line.dash);ctx.beginPath();for(let j=0;j<=200;j++){const t=4*j/200;const y=line.fn(t,tau); if(j===0)ctx.moveTo(xp(t),yp(y));else ctx.lineTo(xp(t),yp(y));}ctx.stroke();}
+   ctx.setLineDash([]);
+ }
+ slider.addEventListener('input',draw);
+ if(typeof ResizeObserver!=='undefined')new ResizeObserver(draw).observe(canvas);else window.addEventListener('resize',draw);
+ draw();
+})();
+</script>
 </body>
 </html>
