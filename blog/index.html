@@ -19,13 +19,13 @@
 .article-toc { display: grid; gap: .27rem; padding: 1.1rem 1.25rem; border: 1px solid var(--line); margin: 2rem 0 2.8rem; background: #f7f9f7; }
 .article-toc strong { margin-bottom: .35rem; }
 .article-toc a { font-size: .93rem; }
-.math-display { margin: 1.25rem 0; padding: .75rem .45rem; overflow-x: auto; overflow-y: hidden; font-size: 1.02rem; text-align: center; line-height: 1.55; }
+.math-display { margin: 1.25rem 0; padding: .75rem .45rem; overflow-x: auto; overflow-y: hidden; font-size: 1.06rem; text-align: center; line-height: 1.55; }
 .math-display mjx-container[display="true"] { margin: .35em 0 !important; max-width: 100%; }
 .blog-page mjx-container:not([display="true"]) { font-size: 1.01em !important; }
 .comparison-grid { display: grid; gap: .65rem; grid-template-columns: repeat(3,minmax(0,1fr)); margin: 1.5rem 0; }
 .comparison-grid > div { border: 1px solid var(--line); padding: 1rem .8rem; }
 .comparison-grid h3 { font-size: 1.04rem; margin-top: 0; }
-.comparison-grid .math-display { font-size: .9rem; margin: .8rem -.25rem; padding: .4rem .1rem; }
+.comparison-grid .math-display { font-size: 1.02rem; margin: .8rem -.25rem; padding: .4rem .1rem; }
 .comparison-grid p { font-size: .91rem; line-height: 1.55; }
 .blog-table { width: 100%; border-collapse: collapse; font-size: .94rem; margin: 1.4rem 0; }
 .blog-table th, .blog-table td { text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); padding: .7rem .55rem; }
@@ -109,7 +109,7 @@ window.MathJax = {
         <h2 id="three-cuts">2. Three ways to cut the same physical network</h2>
         <p>Consider linear diffusion on a finite undirected conductance network. Partition the full state into retained states \(\mathbf{x}\) and exterior states \(\mathbf{z}\). With unit interior storage capacity and a positive exterior capacity \(\tau\), write</p>
         <div class="math-display">\[\begin{aligned}\dot{\mathbf{x}}&=-\mathbf{A}\mathbf{x}+\mathbf{C}\mathbf{z},\\[2pt]\tau\dot{\mathbf{z}}&=\mathbf{C}^{\mathsf T}\mathbf{x}-\mathbf{D}\mathbf{z},\end{aligned}\]</div>
-        <p>Notation throughout: bold lowercase letters denote vectors, bold uppercase letters denote matrices, italic letters denote scalars, and \(\mathcal B\) is a matrix-valued correction. Here \(\mathbf{C}\) contains nonnegative cross-boundary conductances, \(\mathbf{L}_{\mathrm{in}}\) is the Laplacian of the retained edges, and</p>
+        <p>Notation throughout: bold lowercase letters denote state/input vectors, bold uppercase letters denote matrices, and nonbold italic letters denote scalar quantities. Subscripts \(I\) and \(E\) mark retained and exterior blocks; \(\mathcal{B}\) denotes a boundary-correction matrix. Here \(\mathbf{C}\) contains nonnegative cross-boundary conductances, \(\mathbf{L}_{\mathrm{in}}\) is the Laplacian of the retained edges, and \(\mathbf{1}\) is an all-ones vector of matching dimension. Define</p>
         <div class="math-display">\[\begin{aligned}\mathbf{A}&=\mathbf{L}_{\mathrm{in}}+\operatorname{diag}(\mathbf{C}\mathbf{1}),\\[2pt]\mathbf{D}&=\mathbf{L}_{\mathrm{out}}+\operatorname{diag}(\mathbf{C}^{\mathsf T}\mathbf{1}),\end{aligned}\]</div>
         <p>Assume each exterior component touches the retained network so that \(\mathbf{D}\) is invertible. We can now make three very different modeling choices.</p>
         <div class="comparison-grid">
@@ -131,7 +131,7 @@ window.MathJax = {
         <p>The exterior contributes both its initial condition and a response to the retained system’s history. Different boundary sites can become coupled through pathways that lie entirely outside the retained graph. This is direct elimination of an omitted <em>graph subsystem</em>, not a question of spatial discretization.</p>
         <p>In the Laplace domain (for zero exterior initial state), the same effect becomes an operator acting on boundary variables:</p>
         <div class="math-display">\[\mathbf{Y}_{\partial}(s)=\operatorname{diag}(\mathbf{C}\mathbf{1})-\mathbf{C}(\tau s\mathbf{I}+\mathbf{D})^{-1}\mathbf{C}^{\mathsf T}\]</div>
-        <p>A fixed weighted edge may be enough to represent a static boundary relation. A frequency-dependent terminal response generally requires memory, auxiliary states, or an approximation. The <a href="https://doi.org/10.1073/pnas.97.7.2968" target="_blank" rel="noopener noreferrer">Mori–Zwanzig / optimal-prediction literature</a> provides a broader context for why eliminating dynamical degrees of freedom can lead to memory terms.</p>
+        <p>A fixed weighted edge may be enough to represent a static boundary relation. A frequency-dependent terminal response generally requires a time-domain memory operator, auxiliary states, or an approximation. The <a href="https://doi.org/10.1073/pnas.97.7.2968" target="_blank" rel="noopener noreferrer">Mori–Zwanzig / optimal-prediction literature</a> provides a broader context for why eliminating dynamical degrees of freedom can lead to memory terms.</p>
         <p><strong>Critically, an environment is not always a prerecorded input.</strong> When it responds to the subsystem, reusing a measured boundary signal from another trajectory after changing the interior need not preserve the original coupled physics.</p>
       </section>
 
@@ -140,11 +140,13 @@ window.MathJax = {
         <p>A recent example makes this issue concrete. <a href="https://doi.org/10.1587/nolta.17.1146" target="_blank" rel="noopener noreferrer">Suzuki and Hisakado (2026)</a> construct boundary-aware graph representations and spectral GNNs for electrical circuits. Their external port terminations change the physical graph operator even when the internal vertices and edges remain unchanged.</p>
         <div class="math-display">\[\mathbf{L}_{b}(\omega)=\mathbf{L}_{G}+\mathcal{B}(\omega)\]</div>
         <p>In their setup, the matrix-valued correction \(\mathcal{B}(\omega)\) represents frequency-dependent port admittances. The spectral basis built from \(\mathbf{L}_{b}\) can therefore differ from that of the ordinary Laplacian \(\mathbf{L}_{G}\). Their experiments concern synthetic circuits and fault-current/source estimation; they do <strong>not</strong> demonstrate a general solution for unobserved future forcing or arbitrary graph dynamics.</p>
-        <p>A general linear network reveals why effective operators and effective excitations should be distinguished. Partition a frequency-domain network equation into retained and exterior variables (all quantities are frequency-dependent):</p>
-        <div class="math-display">\[\begin{bmatrix}\mathbf{Y}_{II}&\mathbf{Y}_{IE}\\\mathbf{Y}_{EI}&\mathbf{Y}_{EE}\end{bmatrix}\begin{bmatrix}\mathbf{x}\\\mathbf{z}\end{bmatrix}=\begin{bmatrix}\mathbf{j}_{I}\\\mathbf{j}_{E}\end{bmatrix}\]</div>
+        <p>A general linear network reveals why effective operators and effective excitations should be distinguished. In the following frequency-domain circuit equations, \(\mathbf{v}_I(\omega)\) and \(\mathbf{v}_E(\omega)\) denote retained and exterior voltage phasors, and \(\mathbf{j}_I(\omega)\) and \(\mathbf{j}_E(\omega)\) denote current-source phasors:</p>
+        <div class="math-display">\[\begin{bmatrix}\mathbf{Y}_{II}&\mathbf{Y}_{IE}\\\mathbf{Y}_{EI}&\mathbf{Y}_{EE}\end{bmatrix}\begin{bmatrix}\mathbf{v}_I\\\mathbf{v}_E\end{bmatrix}=\begin{bmatrix}\mathbf{j}_{I}\\\mathbf{j}_{E}\end{bmatrix}\]</div>
         <p>When \(\mathbf{Y}_{EE}\) is invertible, eliminating the exterior yields</p>
         <div class="math-display">\[\mathbf{Y}_{\mathrm{eff}}=\mathbf{Y}_{II}-\mathbf{Y}_{IE}\mathbf{Y}_{EE}^{-1}\mathbf{Y}_{EI}\]</div>
         <div class="math-display">\[\mathbf{j}_{\mathrm{eff}}=\mathbf{j}_{I}-\mathbf{Y}_{IE}\mathbf{Y}_{EE}^{-1}\mathbf{j}_{E}\]</div>
+        <p>Consequently, the retained circuit satisfies</p>
+        <div class="math-display">\[\mathbf{Y}_{\mathrm{eff}}(\omega)\mathbf{v}_I(\omega)=\mathbf{j}_{\mathrm{eff}}(\omega).\]</div>
         <p><strong>The first expression changes the effective internal operator; the second changes the effective driving term.</strong> Known terminal admittance does not imply that the particular external excitation is known. An exterior that couples multiple ports can also induce nonlocal off-diagonal terminal responses, whereas independent port terminations may give a diagonal correction.</p>
         <p>This prior work matters for framing: boundary-aware graph learning already exists. The open question here is not whether GNNs can <em>ever</em> accept ports; it is how graph representations, physical boundary models and actually observed boundary information should be distinguished.</p>
       </section>
@@ -182,7 +184,8 @@ window.MathJax = {
         <p>The practical lesson is not “always add memory.” It is: <strong>choose the simplest exterior model that preserves the behavior needed for the task.</strong></p>
 
         <h3>Separate question: what if the boundary forcing is unobserved?</h3>
-        <p>The earlier three-gauge demonstration is still useful, but it tests an <em>information limit</em>, not whether a particular boundary closure is correct. Two different forcing schedules can produce different futures from identical graph observations, while an input-blind point predictor must give the same forecast for both scenarios.</p>
+        <p>The earlier three-gauge demonstration is still useful, but it tests an <em>information limit</em>, not whether a particular boundary closure is correct. Two different forcing schedules can produce different futures from identical graph observations, while an input-blind point predictor must give the same forecast for both scenarios. For three observed gauges and a constant upstream boundary input \(b\), the discrete-time experiment uses</p>
+        <div class="math-display">\[x_i(n+1)=\tfrac12x_i(n)+\tfrac12x_{i-1}(n),\qquad x_0(n)=b,\quad \mathbf{x}(0)=\mathbf{0},\quad i=1,2,3.\]</div>
         <figure class="experiment">
           <div class="river" role="img" aria-label="An unobserved upstream boundary feeds three observed gauges in order">
             <span class="boundary">Boundary</span><span aria-hidden="true">→</span><span>Gauge 1</span><span aria-hidden="true">→</span><span>Gauge 2</span><span aria-hidden="true">→</span><span>Gauge 3</span>
@@ -285,10 +288,10 @@ window.MathJax = {
    const left=46,right=w-15,top=25,bottom=h-38;
    const xp=t=>left+(right-left)*t/4;
    const yp=v=>bottom-(bottom-top)*v/2.1;
-   ctx.font='11px sans-serif';ctx.fillStyle='#59645f';ctx.textAlign='right';
+   ctx.font='12px "Source Sans 3", "Segoe UI", sans-serif';ctx.fillStyle='#59645f';ctx.textAlign='right';
    for(const y of [0,.5,1,1.5,2]){ctx.strokeStyle='#e0e5e2';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(left,yp(y));ctx.lineTo(right,yp(y));ctx.stroke();ctx.fillText(String(y),left-7,yp(y)+4);}
    ctx.textAlign='center';for(const t of [0,1,2,3,4])ctx.fillText(String(t),xp(t),bottom+17);
-   ctx.fillText('Time', (left+right)/2,h-8);ctx.textAlign='left';ctx.fillText('State x1',6,12);
+   ctx.fillText('Time', (left+right)/2,h-8);ctx.textAlign='left';ctx.fillText('State x₁',6,12);
    for(const line of models){ctx.strokeStyle=line.color;ctx.lineWidth=2.45;ctx.setLineDash(line.dash);ctx.beginPath();for(let j=0;j<=200;j++){const t=4*j/200;const y=line.fn(t,tau); if(j===0)ctx.moveTo(xp(t),yp(y));else ctx.lineTo(xp(t),yp(y));}ctx.stroke();}
    ctx.setLineDash([]);
  }
