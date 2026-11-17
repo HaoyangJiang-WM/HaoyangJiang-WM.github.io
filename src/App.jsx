@@ -114,6 +114,7 @@ export default function App() {
           <nav aria-label="Main navigation">
             <a href="#research">Research</a>
             <a href="#publications">Publications</a>
+            <a href="#talks">Talks</a>
             <a href="/blog/">Blog</a>
             <a href={cv}>CV</a>
           </nav>
@@ -154,6 +155,20 @@ export default function App() {
             <h2 id="publications-title">Publications</h2>
             <ul className="publication-list">
               {publications.map((entry) => <Publication key={entry.title} entry={entry} />)}
+            </ul>
+          </section>
+          <section id="talks" aria-labelledby="talks-title">
+            <h2 id="talks-title">Talks</h2>
+            <ul className="publication-list">
+              <li className="publication">
+                <h3>Research talk with Prof. Yan Liu’s group</h3>
+                <p className="publication-details"><span>University of Southern California</span><time dateTime="2026-11">November 2026</time></p>
+              </li>
+              <li className="publication">
+                <h3>Topology-Aware Graph Neural Networks by Physics</h3>
+                <p className="publication-details"><span>University of Michigan · KGML Workshop on AI for Science</span><time dateTime="2025-08">August 2025</time></p>
+                <p className="publication-details"><a href="https://midas.umich.edu/events/kgml-workshop-leading-the-new-paradigm-of-ai-for-science/#schedule">Workshop program</a></p>
+              </li>
             </ul>
           </section>
           <section id="projects" aria-labelledby="projects-title">

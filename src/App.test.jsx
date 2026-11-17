@@ -13,7 +13,7 @@ describe("Haoyang Jiang's academic homepage", () => {
   it("links to the HTML CV and keeps demos out of the main navigation", () => {
     render(<App />);
     const nav = within(screen.getByRole("navigation", { name: "Main navigation" }));
-    for (const name of ["Research", "Publications"]) {
+    for (const name of ["Research", "Publications", "Talks"]) {
       const id = nav.getByRole("link", { name }).getAttribute("href").slice(1);
       expect(document.getElementById(id)).toBeInTheDocument();
     }
