@@ -161,8 +161,8 @@ export default function App() {
             <h2 id="talks-title">Talks</h2>
             <ul className="publication-list">
               <li className="publication">
-                <h3>Research talk with Prof. Yan Liu’s group</h3>
-                <p className="publication-details"><span>University of Southern California</span><time dateTime="2026-11">November 2026</time></p>
+                <h3>Scientific Machine Learning for Physical Systems: Prediction, Generation and Inversion</h3>
+                <p className="publication-details"><span>University of Southern California · Prof. Yan Liu’s group</span><time dateTime="2026-10-23">October 23, 2026</time></p>
               </li>
               <li className="publication">
                 <h3>Topology-Aware Graph Neural Networks by Physics</h3>
